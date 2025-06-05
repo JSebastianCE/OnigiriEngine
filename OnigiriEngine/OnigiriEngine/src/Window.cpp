@@ -2,6 +2,7 @@
 
 /**
  * @class Window
+ *
  * @brief Encapsulates an SFML window, handling creation, events, rendering, and destruction.
  */
 
@@ -12,7 +13,9 @@
   * It also sets the framerate limit and verifies successful creation.
   *
   * @param width Width of the window in pixels.
+  *
   * @param height Height of the window in pixels.
+  *
   * @param title Title of the window.
   */
 Window::Window(int width, int height, const std::string& title) {
@@ -39,7 +42,8 @@ Window::~Window() {
  *
  * Processes the event queue to detect and handle user actions like closing the window.
  */
-void Window::handleEvents() {
+void
+Window::handleEvents() {
   sf::Event event;
   while (m_window->pollEvent(event)) {
     if (event.type == sf::Event::Closed) {
@@ -53,7 +57,8 @@ void Window::handleEvents() {
  *
  * @return true if the window is open, false otherwise.
  */
-bool Window::isOpen() const {
+bool
+Window::isOpen() const {
   if (m_window) {
     return m_window->isOpen();
   }
@@ -68,7 +73,8 @@ bool Window::isOpen() const {
  *
  * @param color The color to use when clearing the window.
  */
-void Window::clear(const sf::Color& color) {
+void
+Window::clear(const sf::Color& color) {
   if (m_window) {
     m_window->clear(color);
   }
@@ -81,9 +87,11 @@ void Window::clear(const sf::Color& color) {
  * @brief Draws a drawable object to the window using specified render states.
  *
  * @param drawable The SFML drawable object to render.
+ *
  * @param states Optional render states to apply to the drawable.
  */
-void Window::draw(const sf::Drawable& drawable, const sf::RenderStates& states){
+void
+Window::draw(const sf::Drawable& drawable, const sf::RenderStates& states) {
   if (m_window) {
     m_window->draw(drawable, states);
   }
@@ -95,7 +103,8 @@ void Window::draw(const sf::Drawable& drawable, const sf::RenderStates& states){
 /**
  * @brief Displays the contents of the current frame on the screen.
  */
-void Window::display() {
+void
+Window::display() {
   if (m_window) {
     m_window->display();
   }
@@ -107,6 +116,7 @@ void Window::display() {
 /**
  * @brief Destroys the window and releases its resources safely.
  */
-void Window::destroy() {
+void
+Window::destroy() {
   SAFE_PTR_RELEASE(m_window);
 }

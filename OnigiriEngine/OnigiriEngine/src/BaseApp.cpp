@@ -21,10 +21,11 @@ BaseApp::~BaseApp() {
  *
  * @return int Returns 0 on successful execution.
  */
-int BaseApp::run() {
+int 
+BaseApp::run() {
   if (!init()) {
     ERROR("BaseApp", "run", "Initializes result on a false statement",
-      "check method validations");
+          "check method validations");
   }
 
   while (m_window->isOpen()) {
@@ -44,13 +45,12 @@ int BaseApp::run() {
  *
  * @return true if initialization succeeds.
  */
-bool BaseApp::init() {
+bool 
+BaseApp::init() {
   m_window = new Window(1920, 1080, "Onigiri Engine");
-
   m_circle = new sf::CircleShape(100.0f);
   m_circle->setFillColor(sf::Color::Yellow);
   m_circle->setPosition(200.f, 150.f);
-
   return true;
 }
 
@@ -59,7 +59,8 @@ bool BaseApp::init() {
  *
  * Empty for now. Intended for game logic or state updates.
  */
-void BaseApp::update() {
+void 
+BaseApp::update() {
 }
 
 /**
@@ -67,7 +68,8 @@ void BaseApp::update() {
  *
  * Clears the screen, draws the circle shape, and displays the result.
  */
-void BaseApp::render() {
+void 
+BaseApp::render() {
   m_window->clear();
   m_window->draw(*m_circle);
   m_window->display();
@@ -78,7 +80,8 @@ void BaseApp::render() {
  *
  * Deletes the shape and properly destroys the window.
  */
-void BaseApp::destroy() {
+void 
+BaseApp::destroy() {
   delete m_circle;
   m_window->destroy();
 }

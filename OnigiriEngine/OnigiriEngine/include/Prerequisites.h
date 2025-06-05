@@ -65,7 +65,8 @@
     * @enum ShapeType
     * @brief Types of shapes that can be created in the system.
     */
-enum ShapeType {
+enum 
+ShapeType {
   EMPTY = 0,    ///< No shape.
   CIRCLE = 1,   ///< Circle shape.
   RECTANGLE = 2,///< Rectangle shape.

@@ -12,7 +12,8 @@
   *
   * @return int Exit status of the application. Returns 0 on successful execution.
   */
-int main() {
+int 
+main() {
   BaseApp app;
   return app.run();
 }

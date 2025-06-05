@@ -12,7 +12,8 @@
   * @class BaseApp
   * @brief Core application class that controls initialization, the main loop, rendering, and cleanup.
   */
-class BaseApp {
+class 
+BaseApp {
 public:
   /**
    * @brief Default constructor.
@@ -30,28 +31,33 @@ public:
    * This method initializes the application, enters the main loop, and calls update/render methods.
    * @return Exit code of the application.
    */
-  int run();
+  int
+  run();
 
   /**
    * @brief Initializes the application window and objects.
    * @return True if initialization was successful, false otherwise.
    */
-  bool init();
+  bool
+  init();
 
   /**
    * @brief Updates the application logic (called every frame).
    */
-  void update();
+  void 
+  update();
 
   /**
    * @brief Renders all drawable objects to the screen.
    */
-  void render();
+  void
+  render();
 
   /**
    * @brief Releases all allocated resources and cleans up.
    */
-  void destroy();
+  void 
+  destroy();
 
 private:
   Window* m_window = nullptr;               ///< Pointer to custom Window class.

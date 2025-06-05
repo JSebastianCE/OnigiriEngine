@@ -65,7 +65,8 @@ sf::Shape* CShape::createShape(ShapeType shapeType) {
  * @param x X coordinate.
  * @param y Y coordinate.
  */
-void CShape::setPosition(float x, float y) {
+void 
+CShape::setPosition(float x, float y) {
   if (m_shape) {
     m_shape->setPosition(x, y);
   }
@@ -79,7 +80,8 @@ void CShape::setPosition(float x, float y) {
  *
  * @param position The position as a 2D vector.
  */
-void CShape::setPosition(const sf::Vector2f& position) {
+void 
+CShape::setPosition(const sf::Vector2f& position) {
   if (m_shape) {
     m_shape->setPosition(position);
   }
@@ -93,7 +95,8 @@ void CShape::setPosition(const sf::Vector2f& position) {
  *
  * @param color The color to apply.
  */
-void CShape::setFillColor(const sf::Color& color) {
+void 
+CShape::setFillColor(const sf::Color& color) {
   if (m_shape) {
     m_shape->setFillColor(color);
   }
@@ -107,7 +110,8 @@ void CShape::setFillColor(const sf::Color& color) {
  *
  * @param angle The rotation angle in degrees.
  */
-void CShape::SetRotation(float angle) {
+void 
+CShape::SetRotation(float angle) {
   if (m_shape) {
     m_shape->setRotation(angle);
   }
@@ -121,7 +125,8 @@ void CShape::SetRotation(float angle) {
  *
  * @param scale The scaling factor as a 2D vector.
  */
-void CShape::setScale(const sf::Vector2f& scale) {
+void 
+CShape::setScale(const sf::Vector2f& scale) {
   if (m_shape) {
     m_shape->setScale(scale);
   }
