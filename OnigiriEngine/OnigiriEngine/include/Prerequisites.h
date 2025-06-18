@@ -15,6 +15,12 @@
 #include <fstream>      ///< File input/output.
 #include <unordered_map>///< Hash table-based associative container.
 
+#include <Memory/TSharedPointer.h>
+#include <Memory/TStaticPtr.h>
+#include <Memory/TUniquePtr.h>
+
+
+
 // === Third Party Libraries ===
 #include <SFML/Graphics.hpp> ///< SFML graphics module.
 

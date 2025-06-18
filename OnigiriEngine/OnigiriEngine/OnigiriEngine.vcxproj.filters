@@ -16,6 +16,9 @@
     <Filter Include="Memory">
       <UniqueIdentifier>{7f6db1ab-dded-4a95-a9e5-10e6131a0262}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ECS">
+      <UniqueIdentifier>{7a1ea2ad-2579-4c4b-b2a7-68d6b383b93e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -55,6 +58,12 @@
     </ClInclude>
     <ClInclude Include="include\Memory\TWeakPointer.h">
       <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ECS\Component.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ECS\Entity.h">
+      <Filter>ECS</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
