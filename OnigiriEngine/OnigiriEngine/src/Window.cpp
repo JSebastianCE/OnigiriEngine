@@ -1,4 +1,5 @@
 #include "Window.h"
+#include <BaseApp.h>
 
 /**
  * @class Window
@@ -13,17 +14,16 @@
   * It also sets the framerate limit and verifies successful creation.
   *
   * @param width Width of the window in pixels.
-  *
   * @param height Height of the window in pixels.
-  *
   * @param title Title of the window.
   */
 Window::Window(int width, int height, const std::string& title) {
-  m_window = new sf::RenderWindow(sf::VideoMode(width, height), title);
+  m_windowPtr = EngineUtilities::MakeUnique<sf::RenderWindow>(
+    sf::VideoMode(width, height), title);
 
-  if (m_window) {
-    m_window->setFramerateLimit(60);
-    MESSAGE("Window", "Window", "Window created succesfully");
+  if (!m_windowPtr.isNull()) {
+    m_windowPtr->setFramerateLimit(60);
+    MESSAGE("Window", "Window", "Window created successfully");
   }
   else {
     ERROR("Window", "Window", "Failed to create window");
@@ -34,7 +34,7 @@ Window::Window(int width, int height, const std::string& title) {
  * @brief Destroys the Window object and safely releases its resources.
  */
 Window::~Window() {
-  SAFE_PTR_RELEASE(m_window);
+  m_windowPtr.release();
 }
 
 /**
@@ -42,12 +42,11 @@ Window::~Window() {
  *
  * Processes the event queue to detect and handle user actions like closing the window.
  */
-void
-Window::handleEvents() {
+void Window::handleEvents() {
   sf::Event event;
-  while (m_window->pollEvent(event)) {
+  while (m_windowPtr->pollEvent(event)) {
     if (event.type == sf::Event::Closed) {
-      m_window->close();
+      m_windowPtr->close();
     }
   }
 }
@@ -57,10 +56,9 @@ Window::handleEvents() {
  *
  * @return true if the window is open, false otherwise.
  */
-bool
-Window::isOpen() const {
-  if (m_window) {
-    return m_window->isOpen();
+bool Window::isOpen() const {
+  if (!m_windowPtr.isNull()) {
+    return m_windowPtr->isOpen();
   }
   else {
     ERROR("Window", "isOpen", "Window is null");
@@ -73,10 +71,9 @@ Window::isOpen() const {
  *
  * @param color The color to use when clearing the window.
  */
-void
-Window::clear(const sf::Color& color) {
-  if (m_window) {
-    m_window->clear(color);
+void Window::clear(const sf::Color& color) {
+  if (!m_windowPtr.isNull()) {
+    m_windowPtr->clear(color);
   }
   else {
     ERROR("Window", "clear", "Window is null");
@@ -87,13 +84,11 @@ Window::clear(const sf::Color& color) {
  * @brief Draws a drawable object to the window using specified render states.
  *
  * @param drawable The SFML drawable object to render.
- *
  * @param states Optional render states to apply to the drawable.
  */
-void
-Window::draw(const sf::Drawable& drawable, const sf::RenderStates& states) {
-  if (m_window) {
-    m_window->draw(drawable, states);
+void Window::draw(const sf::Drawable& drawable, const sf::RenderStates& states) {
+  if (!m_windowPtr.isNull()) {
+    m_windowPtr->draw(drawable, states);
   }
   else {
     ERROR("Window", "draw", "Window is null");
@@ -103,10 +98,9 @@ Window::draw(const sf::Drawable& drawable, const sf::RenderStates& states) {
 /**
  * @brief Displays the contents of the current frame on the screen.
  */
-void
-Window::display() {
-  if (m_window) {
-    m_window->display();
+void Window::display() {
+  if (!m_windowPtr.isNull()) {
+    m_windowPtr->display();
   }
   else {
     ERROR("Window", "display", "Window is null");
@@ -116,7 +110,6 @@ Window::display() {
 /**
  * @brief Destroys the window and releases its resources safely.
  */
-void
-Window::destroy() {
-  SAFE_PTR_RELEASE(m_window);
+void Window::destroy() {
+  m_windowPtr.release();
 }

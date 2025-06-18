@@ -7,13 +7,14 @@
 
 #include "Prerequisites.h"
 #include <Window.h>
+#include "CShape.h" // Agregado para que coincida con el código del profesor
 
  /**
   * @class BaseApp
   * @brief Core application class that controls initialization, the main loop, rendering, and cleanup.
   */
-class 
-BaseApp {
+class
+  BaseApp {
 public:
   /**
    * @brief Default constructor.
@@ -32,34 +33,34 @@ public:
    * @return Exit code of the application.
    */
   int
-  run();
+    run();
 
   /**
    * @brief Initializes the application window and objects.
    * @return True if initialization was successful, false otherwise.
    */
   bool
-  init();
+    init();
 
   /**
    * @brief Updates the application logic (called every frame).
    */
-  void 
-  update();
+  void
+    update();
 
   /**
    * @brief Renders all drawable objects to the screen.
    */
   void
-  render();
+    render();
 
   /**
    * @brief Releases all allocated resources and cleans up.
    */
-  void 
-  destroy();
+  void
+    destroy();
 
 private:
-  Window* m_window = nullptr;               ///< Pointer to custom Window class.
-  sf::CircleShape* m_circle = nullptr;      ///< Pointer to the test SFML circle shape to render.
+  EngineUtilities::TSharedPointer<Window> m_windowPtr;   ///< Pointer to custom Window class using smart pointer.
+  EngineUtilities::TSharedPointer<CShape> m_shapePtr;    ///< Pointer to custom shape class using smart pointer.
 };

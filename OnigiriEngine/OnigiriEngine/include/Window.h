@@ -1,5 +1,8 @@
 #pragma once
 #include "Prerequisites.h"
+#include "Memory/TSharedPointer.h"
+#include "Memory/TUniquePtr.h"
+
 
 /**
  * @file Window.h
@@ -10,8 +13,8 @@
   * @class Window
   * @brief Encapsulates an SFML window, handling initialization, events, rendering, and cleanup.
   */
-class 
- Window {
+class
+  Window {
 public:
   /**
    * @brief Default constructor.
@@ -39,24 +42,24 @@ public:
    *
    * Processes all SFML events in the queue.
    */
-  void 
-  handleEvents();
+  void
+    handleEvents();
 
   /**
    * @brief Checks if the window is currently open.
    *
    * @return true if the window is open, false otherwise.
    */
-  bool 
-  isOpen() const;
+  bool
+    isOpen() const;
 
   /**
    * @brief Clears the window with a specified color.
    *
    * @param color The color used to clear the screen. Defaults to black.
    */
-  void 
-  clear(const sf::Color& color = sf::Color(0, 0, 0, 255));
+  void
+    clear(const sf::Color& color = sf::Color(0, 0, 0, 255));
 
   /**
    * @brief Draws a renderable object to the window.
@@ -64,27 +67,27 @@ public:
    * @param drawable The object to draw (e.g., shape, sprite, text).
    * @param states Optional render states. Defaults to sf::RenderStates::Default.
    */
-  void 
-  draw(const sf::Drawable& drawable,
-       const sf::RenderStates& states = sf::RenderStates::Default);
+  void
+    draw(const sf::Drawable& drawable,
+      const sf::RenderStates& states = sf::RenderStates::Default);
 
   /**
    * @brief Displays the contents of the window.
    *
    * Should be called after drawing all objects for the current frame.
    */
-  void 
-  display();
+  void
+    display();
 
   /**
    * @brief Releases the window resources.
    *
    * Properly deletes the internal SFML window pointer.
    */
-  void 
-  destroy();
+  void
+    destroy();
 
 private:
-  sf::RenderWindow* m_window; ///< Pointer to the SFML render window.
+  EngineUtilities::TUniquePtr<sf::RenderWindow> m_windowPtr; ///< Unique pointer to the SFML render window.
   sf::View m_view; ///< View used for rendering (not currently exposed).
 };

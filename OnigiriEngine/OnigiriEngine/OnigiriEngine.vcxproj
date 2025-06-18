@@ -27,6 +27,10 @@
   <ItemGroup>
     <ClInclude Include="include\BaseApp.h" />
     <ClInclude Include="include\CShape.h" />
+    <ClInclude Include="include\Memory\TSharedPointer.h" />
+    <ClInclude Include="include\Memory\TStaticPtr.h" />
+    <ClInclude Include="include\Memory\TUniquePtr.h" />
+    <ClInclude Include="include\Memory\TWeakPointer.h" />
     <ClInclude Include="include\Prerequisites.h" />
     <ClInclude Include="include\Window.h" />
   </ItemGroup>

@@ -21,15 +21,15 @@ BaseApp::~BaseApp() {
  *
  * @return int Returns 0 on successful execution.
  */
-int 
+int
 BaseApp::run() {
   if (!init()) {
     ERROR("BaseApp", "run", "Initializes result on a false statement",
-          "check method validations");
+      "check method validations");
   }
 
-  while (m_window->isOpen()) {
-    m_window->handleEvents();
+  while (m_windowPtr->isOpen()) {
+    m_windowPtr->handleEvents();
     update();
     render();
   }
@@ -45,12 +45,21 @@ BaseApp::run() {
  *
  * @return true if initialization succeeds.
  */
-bool 
+bool
 BaseApp::init() {
-  m_window = new Window(1920, 1080, "Onigiri Engine");
-  m_circle = new sf::CircleShape(100.0f);
-  m_circle->setFillColor(sf::Color::Yellow);
-  m_circle->setPosition(200.f, 150.f);
+  m_windowPtr = EngineUtilities::MakeShared<Window>(1920, 1080, "Onigiri Engine");
+  if (!m_windowPtr) {
+    ERROR("BaseApp", "init", "Failed to create window pointer, check memory allocation");
+    return false;
+  }
+
+  m_shapePtr = EngineUtilities::MakeShared<CShape>();
+  if (m_shapePtr) {
+    m_shapePtr->createShape(ShapeType::TRIANGLE);
+    m_shapePtr->setFillColor(sf::Color::Yellow);
+    m_shapePtr->setPosition(200.f, 150.f);
+  }
+
   return true;
 }
 
@@ -59,7 +68,7 @@ BaseApp::init() {
  *
  * Empty for now. Intended for game logic or state updates.
  */
-void 
+void
 BaseApp::update() {
 }
 
@@ -68,11 +77,16 @@ BaseApp::update() {
  *
  * Clears the screen, draws the circle shape, and displays the result.
  */
-void 
+void
 BaseApp::render() {
-  m_window->clear();
-  m_window->draw(*m_circle);
-  m_window->display();
+  if (!m_windowPtr) {
+    return;
+  }
+  m_windowPtr->clear();
+  if (m_shapePtr) {
+    m_shapePtr->render(m_windowPtr);
+  }
+  m_windowPtr->display();
 }
 
 /**
@@ -80,8 +94,8 @@ BaseApp::render() {
  *
  * Deletes the shape and properly destroys the window.
  */
-void 
+void
 BaseApp::destroy() {
-  delete m_circle;
-  m_window->destroy();
+  // m_shapePtr.Reset(); // Not necessary if using smart pointers correctly
+  // m_windowPtr.Reset(); // Cleanup handled automatically
 }
