@@ -9,6 +9,7 @@
 #include "Memory/TUniquePtr.h"
 #include <CShape.h>
 #include <Memory/TSharedPointer.h>
+#include "ECS\Component.h"
 
 class
   Window;
@@ -18,12 +19,25 @@ class
  * @brief A class for handling 2D shapes in a graphical application using SFML.
  */
 class
-  CShape {
+  CShape : public Component{
 public:
   /**
    * @brief Default constructor.
    */
   CShape() = default;
+
+
+  CShape(ShapeType shapeType) : m_shapePtr(nullptr),
+                                m_shapeType(ShapeType::EMPTY),
+                                Component(ComponentType::SHAPE) {
+  }
+
+
+
+
+
+
+
 
   /**
    * @brief Constructor that initializes the shape type.
@@ -36,6 +50,7 @@ public:
   /**
    * @brief Default destructor.
    */
+  virtual
   ~CShape() = default;
 
   /**

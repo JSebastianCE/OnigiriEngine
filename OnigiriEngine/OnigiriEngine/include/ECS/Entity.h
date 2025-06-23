@@ -18,7 +18,7 @@ public:
    * @param deltaTime Time elapsed since last frame (used for time-dependent setup).
    */
   virtual void
-  start(float deltaTime) = 0;
+  start() = 0;
 
   /**
    * @brief Pure virtual method for updating logic every frame.
@@ -50,6 +50,12 @@ public:
   template<typename T>
   EngineUtilities::TSharedPointer<T>
     getComponents() {
+    for (auto& component : components) {
+      EngineUtilities::TSharedPointer<T> specificComponent = component.template dynamic_pointer_cast<T>();
+      if (specificComponent) {
+        return specificComponent;
+      }
+    }
     return EngineUtilities::TSharedPointer<T>();
   }
 
