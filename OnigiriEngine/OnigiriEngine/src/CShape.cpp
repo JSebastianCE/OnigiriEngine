@@ -59,6 +59,24 @@ CShape::createShape(ShapeType shapeType) {
   }
 }
 
+CShape::CShape(ShapeType shapeType)
+{
+}
+
+void CShape::start(float deltaTime) {
+  // Tu lógica aquí
+}
+
+void 
+CShape::update(float deltaTime) {
+  // Future logic for animation or state change
+}
+
+void CShape::destroy() {
+  m_shapePtr.reset();
+}
+
+
 /**
  * @brief Renders the shape using the given window.
  *
@@ -148,4 +166,9 @@ CShape::setScale(const sf::Vector2f& scale) {
   else {
     ERROR("CShape", "setScale", "Shape is not initialized.");
   }
+}
+
+sf::Shape* CShape::getShape()
+{
+  return nullptr;
 }

@@ -2,121 +2,118 @@
 
 /**
  * @file CShape.h
- * @brief Defines the CShape class for creating and managing SFML shapes.
+ * @brief Declares the CShape class used to represent 2D shapes as components in the ECS system.
  */
 
 #include "Prerequisites.h"
+#include "Memory/TSharedPointer.h"
 #include "Memory/TUniquePtr.h"
-#include <CShape.h>
-#include <Memory/TSharedPointer.h>
-#include "ECS\Component.h"
+#include "ECS/Component.h"
 
-class
-  Window;
+class Window;
 
 /**
  * @class CShape
- * @brief A class for handling 2D shapes in a graphical application using SFML.
+ * @brief A component that represents a drawable 2D shape using SFML.
+ *
+ * Supports circle, rectangle, triangle, and polygon shapes.
  */
-class
-  CShape : public Component{
+class CShape : public Component {
 public:
   /**
    * @brief Default constructor.
    */
   CShape() = default;
 
-
-  CShape(ShapeType shapeType) : m_shapePtr(nullptr),
-                                m_shapeType(ShapeType::EMPTY),
-                                Component(ComponentType::SHAPE) {
-  }
-
-
-
-
-
-
-
+  /**
+   * @brief Constructs a CShape component with a specific shape type.
+   * @param shapeType Type of the shape to initialize.
+   */
+  CShape(ShapeType shapeType);
 
   /**
-   * @brief Constructor that initializes the shape type.
-   * @param shapeType Type of shape to initialize.
+   * @brief Destructor.
    */
-  CShape(ShapeType shapeType)
-    : m_shapePtr(nullptr), m_shapeType(ShapeType::EMPTY) {
-  }
-
-  /**
-   * @brief Default destructor.
-   */
-  virtual
+  virtual 
   ~CShape() = default;
 
   /**
-   * @brief Creates a shape based on the specified ShapeType.
-   * @param shapeType Enum value of the shape to create.
+   * @brief Initializes the component.
    */
-  void createShape(ShapeType shapeType); // Cambiado el tipo de retorno a void
+  void 
+  start(float deltaTime) override;
 
   /**
-   * @brief Updates the shape (currently unused but available for future use).
+   * @brief Updates the shape logic.
    * @param deltaTime Time elapsed since last frame.
    */
-  void
-    update(float deltaTime);
+  void 
+  update(float deltaTime) override;
 
   /**
-   * @brief Renders the shape to the specified window.
-   * @param window Reference to the custom Window object.
+   * @brief Renders the shape on screen.
+   * @param window Pointer to the rendering window.
    */
   void
-    render(const EngineUtilities::TSharedPointer<Window>& window); // Adaptado para usar smart pointer
+  render(const EngineUtilities::TSharedPointer<Window>& window) override;
 
   /**
-   * @brief Sets the position of the shape.
+   * @brief Cleans up the component resources.
+   */
+  void 
+  destroy() override;
+
+  /**
+   * @brief Creates a new shape based on the specified type.
+   * @param shapeType Type of shape to create.
+   */
+  void 
+  createShape(ShapeType shapeType);
+
+  /**
+   * @brief Sets the shape position using coordinates.
    * @param x X coordinate.
    * @param y Y coordinate.
    */
   void
-    setPosition(float x, float y);
+  setPosition(float x, float y);
 
   /**
-   * @brief Sets the position of the shape using a vector.
-   * @param position 2D vector specifying the position.
+   * @brief Sets the shape position using a vector.
+   * @param position SFML 2D vector.
    */
-  void
-    setPosition(const sf::Vector2f& position);
+  void 
+  setPosition(const sf::Vector2f& position);
 
   /**
    * @brief Sets the fill color of the shape.
-   * @param color SFML color to fill the shape with.
+   * @param color Color to apply.
    */
-  void
-    setFillColor(const sf::Color& color);
+  void 
+  setFillColor(const sf::Color& color);
 
   /**
-   * @brief Sets the rotation of the shape.
-   * @param angle Rotation angle in degrees.
+   * @brief Sets the shape's rotation.
+   * @param angle Angle in degrees.
    */
-  void
-    SetRotation(float angle);
+  void 
+  SetRotation(float angle);
 
   /**
    * @brief Sets the scale of the shape.
    * @param scl Scale factor as a 2D vector.
    */
-  void
-    setScale(const sf::Vector2f& scl);
+  void 
+  setScale(const sf::Vector2f& scl);
 
   /**
-   * @brief Returns the raw SFML shape pointer.
-   * @return Pointer to the current SFML shape.
+   * @brief Returns the raw shape pointer (for low-level access).
+   * @return Pointer to the internal SFML shape, or nullptr if not set.
    */
-  sf::Shape* getShape() { return m_shapePtr ? m_shapePtr.operator->() : nullptr; }
+  sf::Shape* getShape();
 
 private:
   EngineUtilities::TSharedPointer<sf::Shape> m_shapePtr; ///< Smart pointer to the SFML shape.
-  ShapeType m_shapeType = ShapeType::EMPTY;             ///< Current type of shape.
-  sf::VertexArray* m_line = nullptr;                    ///< Reserved for line shapes or outlines (not used yet).
+  ShapeType m_shapeType = ShapeType::EMPTY;              ///< Type of the current shape.
+  sf::VertexArray* m_line = nullptr;                     ///< Reserved for line shapes (optional).
 };

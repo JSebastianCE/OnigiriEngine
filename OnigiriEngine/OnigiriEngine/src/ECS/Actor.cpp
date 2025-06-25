@@ -8,12 +8,24 @@ Actor::Actor(const std::string& actorName) {
   EngineUtilities::TSharedPointer<CShape> shape = EngineUtilities::MakeShared<CShape>();
 }
 
+void Actor::start()
+{
+}
 
 
 
+
+
+void Actor::update(float deltaTime)
+{
+}
 
 void
 Actor::render(const EngineUtilities::TSharedPointer<Window>& window) {
 
 
+}
+
+void Actor::destroy()
+{
 }
