@@ -63,7 +63,7 @@ CShape::CShape(ShapeType shapeType)
 {
 }
 
-void CShape::start(float deltaTime) {
+void CShape::start() {
   // Tu lógica aquí
 }
 

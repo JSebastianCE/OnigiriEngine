@@ -58,7 +58,7 @@ public:
    * @param deltaTime Time elapsed since last frame (used for time-dependent setup).
    */
   virtual void 
-  start(float deltaTime) = 0;
+  start() = 0;
 
   /**
    * @brief Pure virtual method for updating logic every frame.

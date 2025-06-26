@@ -41,7 +41,7 @@ public:
    * @brief Initializes the component.
    */
   void 
-  start(float deltaTime) override;
+  start() override;
 
   /**
    * @brief Updates the shape logic.

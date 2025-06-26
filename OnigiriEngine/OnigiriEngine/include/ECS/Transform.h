@@ -34,9 +34,9 @@ public:
 
   // Métodos override del sistema ECS
 
- 
+  //Quitar deltaTime al START
   void 
-  start(float deltaTime) override {}
+  start() override {}
 
   
   void 
