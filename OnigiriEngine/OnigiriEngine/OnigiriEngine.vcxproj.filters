@@ -74,5 +74,8 @@
     <ClInclude Include="include\ECS\Transform.h">
       <Filter>ECS</Filter>
     </ClInclude>
+    <ClInclude Include="include\ECS\Utilities.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
