@@ -8,6 +8,7 @@
 #include <SFML/System/Vector2.hpp>
 #include "ECS/Component.h"
 
+
 class Window;
 
 /**
@@ -35,8 +36,8 @@ public:
   // Métodos override del sistema ECS
 
   //Quitar deltaTime al START
-  void 
-  start() override {}
+  void
+  start() override;
 
   
   void 
@@ -52,26 +53,30 @@ public:
 
   // Setters
   void 
-  setPosition(const sf::Vector2f& pos) { 
-  m_position = pos; }   //Se supone que es para que actualice el valo de la clase 
+  setPosition(const sf::Vector2f& _position) { 
+  m_position = _position; }   //Se supone que es para que actualice el valor de la clase 
 
   void 
-  setRotation(const sf::Vector2f& rot) { 
-  m_rotation = rot; }
+  setRotation(const sf::Vector2f& _rotation) { 
+  m_rotation = _rotation; }
 
   void 
-  setScale(const sf::Vector2f& scl) { 
-  m_scale = scl; }
+  setScale(const sf::Vector2f& _scale) { 
+  m_scale = _scale; }
+
 
   // Getters
   sf::Vector2f 
-  getPosition() const { return m_position; }
+    getPosition() const
+  { return m_position; }
 
   sf::Vector2f 
-  getRotation() const { return m_rotation; }
+    getRotation() const
+  { return m_rotation; }
 
   sf::Vector2f 
-  getScale()    const { return m_scale; }
+    getScale() const
+  { return m_scale; }
 
 private:
   sf::Vector2f m_position; 

@@ -97,7 +97,7 @@ public:
    * @param angle Angle in degrees.
    */
   void 
-  SetRotation(float angle);
+  setRotation(float angle);
 
   /**
    * @brief Sets the scale of the shape.

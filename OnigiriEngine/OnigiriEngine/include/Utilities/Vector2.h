@@ -104,7 +104,7 @@ public:
     return index == 0 ? x : y;
   }
 
-  // === Geometric functions ===
+  //  Geometric functions 
 
   /**
    * @brief Calculates the length (magnitude) of the vector.
@@ -167,7 +167,7 @@ public:
     }
   }
 
-  // === Static utility methods ===
+  // Static utility methods 
 
   /**
    * @brief Calculates the distance between two points.
@@ -210,7 +210,7 @@ public:
     return CVector2(1.f, 1.f);
   }
 
-  // === Transform-style debug methods ===
+  // Transform-style debug methods 
 
   /**
    * @brief Sets this vector as a position.
@@ -261,6 +261,10 @@ public:
     x = origin.x;
     y = origin.y;
   }
+
+
+  //se va para utilidades
+
 
 private:
   /**

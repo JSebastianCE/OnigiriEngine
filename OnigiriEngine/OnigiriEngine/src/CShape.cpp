@@ -59,9 +59,12 @@ CShape::createShape(ShapeType shapeType) {
   }
 }
 
+/*
 CShape::CShape(ShapeType shapeType)
 {
 }
+*/
+
 
 void CShape::start() {
   // Tu lógica aquí
@@ -143,8 +146,8 @@ CShape::setFillColor(const sf::Color& color) {
  *
  * @param angle The rotation angle in degrees.
  */
-void
-CShape::SetRotation(float angle) {
+void CShape::setRotation(float angle)
+{
   if (m_shapePtr) {
     m_shapePtr->setRotation(angle);
   }

@@ -8,6 +8,7 @@
 #include "Prerequisites.h"
 #include <Window.h>
 #include "CShape.h" // Agregado para que coincida con el código del profesor
+#include "ECS/Actor.h"
 
  /**
   * @class BaseApp
@@ -33,34 +34,35 @@ public:
    * @return Exit code of the application.
    */
   int
-    run();
+  run();
 
   /**
    * @brief Initializes the application window and objects.
    * @return True if initialization was successful, false otherwise.
    */
   bool
-    init();
+  init();
 
   /**
    * @brief Updates the application logic (called every frame).
    */
   void
-    update();
+  update();
 
   /**
    * @brief Renders all drawable objects to the screen.
    */
   void
-    render();
+  render();
 
   /**
    * @brief Releases all allocated resources and cleans up.
    */
   void
-    destroy();
+  destroy();
 
 private:
   EngineUtilities::TSharedPointer<Window> m_windowPtr;   ///< Pointer to custom Window class using smart pointer.
   EngineUtilities::TSharedPointer<CShape> m_shapePtr;    ///< Pointer to custom shape class using smart pointer.
+  EngineUtilities::TSharedPointer<Actor> m_ACircle;
 };

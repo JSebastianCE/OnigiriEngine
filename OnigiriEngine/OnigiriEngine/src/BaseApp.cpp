@@ -1,4 +1,5 @@
 #include "BaseApp.h"
+#include <ECS/Actor.h>
 
 /**
  * @file BaseApp.cpp
@@ -55,9 +56,26 @@ BaseApp::init() {
 
   m_shapePtr = EngineUtilities::MakeShared<CShape>();
   if (m_shapePtr) {
-    m_shapePtr->createShape(ShapeType::TRIANGLE);
+    m_shapePtr->createShape(ShapeType::CIRCLE);
     m_shapePtr->setFillColor(sf::Color::Yellow);
     m_shapePtr->setPosition(200.f, 150.f);
+  }
+
+  /*m_shapePtr = EngineUtilities::MakeShared<CShape>();
+  if (m_shapePtr) {
+    m_shapePtr->createShape(ShapeType::CIRCLE);
+    m_shapePtr->setFillColor(sf::Color::Blue);
+    m_shapePtr->setPosition(150.f, 200.f);
+  }*/
+
+
+  //Create Circle Actor
+  m_ACircle = EngineUtilities::MakeShared<Actor>("Circle Actor");
+  if (m_ACircle) {
+    m_ACircle->getComponent<CShape>()->createShape(CIRCLE);
+    m_ACircle->getComponent<CShape>()->setFillColor(sf::Color::Red);
+    m_ACircle->getComponent<Transform>()->setPosition(sf::Vector2 (100.f, 150.f));
+    //m_ACircle->setName("Circle Actor");
   }
 
   return true;
@@ -70,6 +88,10 @@ BaseApp::init() {
  */
 void
 BaseApp::update() {
+  // Update actors
+  if (!m_ACircle.isNull()) {  
+    m_ACircle->update(0);
+  }
 }
 
 /**
@@ -82,12 +104,20 @@ BaseApp::render() {
   if (!m_windowPtr) {
     return;
   }
+
   m_windowPtr->clear();
+
   if (m_shapePtr) {
     m_shapePtr->render(m_windowPtr);
   }
+
+  if (!m_ACircle.isNull()) {
+    m_ACircle->render(m_windowPtr);
+  }
+
   m_windowPtr->display();
 }
+
 
 /**
  * @brief Releases allocated resources.

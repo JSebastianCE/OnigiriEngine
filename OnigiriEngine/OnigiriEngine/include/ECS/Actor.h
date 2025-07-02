@@ -2,6 +2,7 @@
 #include "..//Prerequisites.h"
 #include "Entity.h"
 #include "CShape.h"
+#include "Transform.h"
 
 class
 Actor : public Entity{
@@ -26,15 +27,16 @@ public:
   destroy() override;
 
 
-
+  template <typename T>
+  EngineUtilities::TSharedPointer<T> getComponent();
  
  private:
  std::string m_name = "Actor";
 
-
+};
 
   template <typename T>
-  inline EngineUtilities::TSharedPointer<T> getComponents() {
+  inline EngineUtilities::TSharedPointer<T> Actor::getComponent() {
     for (auto& component : components) {
       EngineUtilities::TSharedPointer<T> specificComponent = component.template dynamic_pointer_cast<T>();
       if (specificComponent) {
@@ -44,4 +46,3 @@ public:
     return EngineUtilities::TSharedPointer<T>();
   }
 
-};
