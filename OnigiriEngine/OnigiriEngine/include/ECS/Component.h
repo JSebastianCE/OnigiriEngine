@@ -88,5 +88,5 @@ public:
   getType() const { return m_type; }
 
 protected:
-  ComponentType m_type; ///< The specific type of the component.
+ComponentType m_type; ///< The specific type of the component.
 };

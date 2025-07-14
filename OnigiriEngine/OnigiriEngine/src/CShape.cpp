@@ -66,7 +66,8 @@ CShape::CShape(ShapeType shapeType)
 */
 
 
-void CShape::start() {
+void 
+CShape::start() {
   // Tu lógica aquí
 }
 
@@ -75,7 +76,8 @@ CShape::update(float deltaTime) {
   // Future logic for animation or state change
 }
 
-void CShape::destroy() {
+void 
+CShape::destroy() {
   m_shapePtr.reset();
 }
 
@@ -146,7 +148,8 @@ CShape::setFillColor(const sf::Color& color) {
  *
  * @param angle The rotation angle in degrees.
  */
-void CShape::setRotation(float angle)
+void 
+CShape::setRotation(float angle)
 {
   if (m_shapePtr) {
     m_shapePtr->setRotation(angle);

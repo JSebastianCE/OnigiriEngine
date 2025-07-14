@@ -13,11 +13,13 @@ Actor::Actor(const std::string& actorName) {
   addComponent(transform);
 }
 
-void Actor::start() {
+void 
+Actor::start() {
   // Inicializa el actor aquí si es necesario
 }
 
-void Actor::destroy() {
+void
+Actor::destroy() {
   // Libera recursos si es necesario
 }
 

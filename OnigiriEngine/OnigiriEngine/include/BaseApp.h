@@ -15,7 +15,7 @@
   * @brief Core application class that controls initialization, the main loop, rendering, and cleanup.
   */
 class
-  BaseApp {
+BaseApp {
 public:
   /**
    * @brief Default constructor.
