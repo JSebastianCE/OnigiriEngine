@@ -76,6 +76,12 @@ BaseApp::init() {
     m_ACircle->getComponent<CShape>()->setFillColor(sf::Color::Red);
     m_ACircle->getComponent<Transform>()->setPosition(sf::Vector2 (100.f, 150.f));
     //m_ACircle->setName("Circle Actor");
+
+    //Waypoints
+    m_waypoints.push_back(sf::Vector2f(400.f, 150.f));
+    m_waypoints.push_back(sf::Vector2f(700.f, 300.f));
+    m_waypoints.push_back(sf::Vector2f(1000.f, 150.f));
+    m_waypoints.push_back(sf::Vector2f(1200.f, 500.f));
   }
 
   return true;
@@ -88,22 +94,42 @@ BaseApp::init() {
  */
 void
 BaseApp::update() {
-  // Update actors
   if (!m_windowPtr.isNull()) {
     m_windowPtr->update();
   }
 
-  //Update actors
-  if (!m_ACircle.isNull()) {
+  if (!m_ACircle.isNull() && !m_waypoints.empty()) {
     m_ACircle->update(m_windowPtr->deltaTime.asSeconds());
 
-    //Posicion del destino (Punto recorrido)
-    sf::Vector2f targetPos(1200.f, 150.f);
+    // Obtener el destino actual del waypoint
+    sf::Vector2f targetPos = m_waypoints[m_currentWaypointIndex];
 
-    //Llamar al seek del Transform
-    m_ACircle->getComponent<Transform>()->seek(targetPos, 200.0f, m_windowPtr->deltaTime.asSeconds(), 10.0f);
+    // Obtener posición actual del actor
+    sf::Vector2f currentPos = m_ACircle->getComponent<Transform>()->getPosition();
+
+    // Calcular distancia al waypoint
+    float dx = targetPos.x - currentPos.x;
+    float dy = targetPos.y - currentPos.y;
+    float distance = std::sqrt(dx * dx + dy * dy);
+
+    // Si llegó al waypoint actual, pasar al siguiente
+    if (distance < 10.0f) {
+      m_currentWaypointIndex++;
+      if (m_currentWaypointIndex >= static_cast<int>(m_waypoints.size())) {
+        m_currentWaypointIndex = 0; // Volver al inicio (comportamiento cíclico)
+      }
+    }
+
+    // Buscar hacia el waypoint actual
+    m_ACircle->getComponent<Transform>()->seek(
+      m_waypoints[m_currentWaypointIndex],
+      200.0f,
+      m_windowPtr->deltaTime.asSeconds(),
+      10.0f
+    );
   }
 }
+
 
 /**
  * @brief Renders the current frame.

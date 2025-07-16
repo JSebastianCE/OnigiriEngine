@@ -10,6 +10,8 @@
 #include "CShape.h" // Agregado para que coincida con el código del profesor
 #include "ECS/Actor.h"
 
+#include <vector>
+
  /**
   * @class BaseApp
   * @brief Core application class that controls initialization, the main loop, rendering, and cleanup.
@@ -65,4 +67,10 @@ private:
   EngineUtilities::TSharedPointer<Window> m_windowPtr;   ///< Pointer to custom Window class using smart pointer.
   EngineUtilities::TSharedPointer<CShape> m_shapePtr;    ///< Pointer to custom shape class using smart pointer.
   EngineUtilities::TSharedPointer<Actor> m_ACircle;
+
+
+
+
+  std::vector<sf::Vector2f> m_waypoints; ///< Lista de posiciones a seguir por el actor.
+  int m_currentWaypointIndex = 0;        ///< Índice del waypoint actual.
 };
