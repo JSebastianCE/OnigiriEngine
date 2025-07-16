@@ -14,7 +14,7 @@
   * @brief Encapsulates an SFML window, handling initialization, events, rendering, and cleanup.
   */
 class
-  Window {
+Window {
 public:
   /**
    * @brief Default constructor.
@@ -43,7 +43,7 @@ public:
    * Processes all SFML events in the queue.
    */
   void
-    handleEvents();
+  handleEvents();
 
   /**
    * @brief Checks if the window is currently open.
@@ -51,7 +51,7 @@ public:
    * @return true if the window is open, false otherwise.
    */
   bool
-    isOpen() const;
+  isOpen() const;
 
   /**
    * @brief Clears the window with a specified color.
@@ -59,7 +59,7 @@ public:
    * @param color The color used to clear the screen. Defaults to black.
    */
   void
-    clear(const sf::Color& color = sf::Color(0, 0, 0, 255));
+  clear(const sf::Color& color = sf::Color(0, 0, 0, 255));
 
   /**
    * @brief Draws a renderable object to the window.
@@ -68,7 +68,7 @@ public:
    * @param states Optional render states. Defaults to sf::RenderStates::Default.
    */
   void
-    draw(const sf::Drawable& drawable,
+  draw(const sf::Drawable& drawable,
       const sf::RenderStates& states = sf::RenderStates::Default);
 
   /**
@@ -77,7 +77,12 @@ public:
    * Should be called after drawing all objects for the current frame.
    */
   void
-    display();
+  display();
+
+
+  void
+  update();
+
 
   /**
    * @brief Releases the window resources.
@@ -85,9 +90,12 @@ public:
    * Properly deletes the internal SFML window pointer.
    */
   void
-    destroy();
+  destroy();
 
 private:
   EngineUtilities::TUniquePtr<sf::RenderWindow> m_windowPtr; ///< Unique pointer to the SFML render window.
   sf::View m_view; ///< View used for rendering (not currently exposed).
+public:
+  sf::Time deltaTime;
+  sf::Clock clock;
 };

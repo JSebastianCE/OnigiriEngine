@@ -42,7 +42,8 @@ Window::~Window() {
  *
  * Processes the event queue to detect and handle user actions like closing the window.
  */
-void Window::handleEvents() {
+void
+Window::handleEvents() {
   sf::Event event;
   while (m_windowPtr->pollEvent(event)) {
     if (event.type == sf::Event::Closed) {
@@ -56,7 +57,8 @@ void Window::handleEvents() {
  *
  * @return true if the window is open, false otherwise.
  */
-bool Window::isOpen() const {
+bool
+Window::isOpen() const {
   if (!m_windowPtr.isNull()) {
     return m_windowPtr->isOpen();
   }
@@ -71,7 +73,8 @@ bool Window::isOpen() const {
  *
  * @param color The color to use when clearing the window.
  */
-void Window::clear(const sf::Color& color) {
+void
+Window::clear(const sf::Color& color) {
   if (!m_windowPtr.isNull()) {
     m_windowPtr->clear(color);
   }
@@ -86,7 +89,8 @@ void Window::clear(const sf::Color& color) {
  * @param drawable The SFML drawable object to render.
  * @param states Optional render states to apply to the drawable.
  */
-void Window::draw(const sf::Drawable& drawable, const sf::RenderStates& states) {
+void 
+Window::draw(const sf::Drawable& drawable, const sf::RenderStates& states) {
   if (!m_windowPtr.isNull()) {
     m_windowPtr->draw(drawable, states);
   }
@@ -98,7 +102,8 @@ void Window::draw(const sf::Drawable& drawable, const sf::RenderStates& states) 
 /**
  * @brief Displays the contents of the current frame on the screen.
  */
-void Window::display() {
+void
+Window::display() {
   if (!m_windowPtr.isNull()) {
     m_windowPtr->display();
   }
@@ -107,9 +112,17 @@ void Window::display() {
   }
 }
 
+void
+Window::update() {
+  //Almacenar el deltaTime una sola vez
+  deltaTime = clock.restart();
+}
+
+
 /**
  * @brief Destroys the window and releases its resources safely.
  */
-void Window::destroy() {
+void 
+Window::destroy() {
   m_windowPtr.release();
 }

@@ -5,8 +5,9 @@
  * @brief Declares the Transform component used for managing position, rotation, and scale in entities.
  */
 
-#include <SFML/System/Vector2.hpp>
+#include "..//Prerequisites.h"
 #include "ECS/Component.h"
+#include "WIndow.h"
 
 
 class Window;
@@ -49,6 +50,20 @@ public:
 
   void 
   destroy() override {
+  }
+
+  void
+  seek(const sf::Vector2f& targetPosition,
+      float speed,
+      float deltaTime,
+      float range) {
+    sf::Vector2f direction = targetPosition - m_position;
+    float lenght = std::sqrt(direction.x * direction.x + direction.y * direction.y);
+
+    if (lenght > range) {
+      direction /= lenght;
+      m_position += direction * speed * deltaTime;
+    }
   }
 
   // Setters

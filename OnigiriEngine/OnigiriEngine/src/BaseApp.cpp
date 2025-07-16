@@ -89,8 +89,19 @@ BaseApp::init() {
 void
 BaseApp::update() {
   // Update actors
-  if (!m_ACircle.isNull()) {  
-    m_ACircle->update(0);
+  if (!m_windowPtr.isNull()) {
+    m_windowPtr->update();
+  }
+
+  //Update actors
+  if (!m_ACircle.isNull()) {
+    m_ACircle->update(m_windowPtr->deltaTime.asSeconds());
+
+    //Posicion del destino (Punto recorrido)
+    sf::Vector2f targetPos(1200.f, 150.f);
+
+    //Llamar al seek del Transform
+    m_ACircle->getComponent<Transform>()->seek(targetPos, 200.0f, m_windowPtr->deltaTime.asSeconds(), 10.0f);
   }
 }
 
