@@ -11,6 +11,7 @@
 #include "ECS/Component.h"
 
 class Window;
+class Texture;
 
 /**
  * @class CShape
@@ -105,6 +106,9 @@ public:
    */
   void 
   setScale(const sf::Vector2f& scl);
+
+  void
+  setTexture(const EngineUtilities::TSharedPointer<Texture>& texture);
 
   /**
    * @brief Returns the raw shape pointer (for low-level access).

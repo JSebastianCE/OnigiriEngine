@@ -80,5 +80,8 @@
     <ClInclude Include="include\Utilities\Vector2.h">
       <Filter>ECS</Filter>
     </ClInclude>
+    <ClInclude Include="include\ECS\Texture.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

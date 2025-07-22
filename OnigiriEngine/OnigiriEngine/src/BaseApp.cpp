@@ -75,6 +75,7 @@ BaseApp::init() {
     m_ACircle->getComponent<CShape>()->createShape(CIRCLE);
     m_ACircle->getComponent<CShape>()->setFillColor(sf::Color::Red);
     m_ACircle->getComponent<Transform>()->setPosition(sf::Vector2 (100.f, 150.f));
+    m_ACircle->setTexture();
     //m_ACircle->setName("Circle Actor");
 
     //Waypoints

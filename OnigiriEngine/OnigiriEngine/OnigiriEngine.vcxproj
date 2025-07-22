@@ -32,6 +32,7 @@
     <ClInclude Include="include\ECS\Actor.h" />
     <ClInclude Include="include\ECS\Component.h" />
     <ClInclude Include="include\ECS\Entity.h" />
+    <ClInclude Include="include\ECS\Texture.h" />
     <ClInclude Include="include\ECS\Transform.h" />
     <ClInclude Include="include\Memory\TSharedPointer.h" />
     <ClInclude Include="include\Memory\TStaticPtr.h" />
