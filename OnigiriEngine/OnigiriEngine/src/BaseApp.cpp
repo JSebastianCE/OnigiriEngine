@@ -1,5 +1,6 @@
 #include "BaseApp.h"
-#include <ECS/Actor.h>
+//#include <ECS/Actor.h>
+#include "ResourceManager.h"
 
 /**
  * @file BaseApp.cpp
@@ -48,41 +49,93 @@ BaseApp::run() {
  */
 bool
 BaseApp::init() {
+  ResourceManager& resourceMan = ResourceManager::getInstance();
+
   m_windowPtr = EngineUtilities::MakeShared<Window>(1920, 1080, "Onigiri Engine");
   if (!m_windowPtr) {
     ERROR("BaseApp", "init", "Failed to create window pointer, check memory allocation");
     return false;
   }
 
-  m_shapePtr = EngineUtilities::MakeShared<CShape>();
-  if (m_shapePtr) {
-    m_shapePtr->createShape(ShapeType::CIRCLE);
-    m_shapePtr->setFillColor(sf::Color::Yellow);
-    m_shapePtr->setPosition(200.f, 150.f);
-  }
 
-  /*m_shapePtr = EngineUtilities::MakeShared<CShape>();
-  if (m_shapePtr) {
-    m_shapePtr->createShape(ShapeType::CIRCLE);
-    m_shapePtr->setFillColor(sf::Color::Blue);
-    m_shapePtr->setPosition(150.f, 200.f);
-  }*/
+
+
+  // Crear pista de carreras
+  m_Track = EngineUtilities::MakeShared<Actor>("Track Actor");
+  if (m_Track) {
+    // Asignar textura
+    m_Track->getComponent<CShape>()->createShape(RECTANGLE);
+    m_Track->getComponent<CShape>()->setFillColor(sf::Color::White);
+    m_Track->getComponent<Transform>()->setPosition(sf::Vector2f(0.f, 0.f));
+    m_Track->getComponent<Transform>()->setScale(sf::Vector2f(17.0f, 22.0f));
+
+    if (!resourceMan.loadTexture("Sprites/Track", "png")) {
+      MESSAGE("BaseApp", "Init", "Can't load the texture");
+    }
+
+    m_Track->setTexture(resourceMan.getTexture("Sprites/Track"));
+
+  }
+ 
+
 
 
   //Create Circle Actor
-  m_ACircle = EngineUtilities::MakeShared<Actor>("Circle Actor");
+  m_ACircle = EngineUtilities::MakeShared<Actor>("yoshi");
   if (m_ACircle) {
     m_ACircle->getComponent<CShape>()->createShape(CIRCLE);
-    m_ACircle->getComponent<CShape>()->setFillColor(sf::Color::Red);
-    m_ACircle->getComponent<Transform>()->setPosition(sf::Vector2 (100.f, 150.f));
-    m_ACircle->setTexture();
-    //m_ACircle->setName("Circle Actor");
+    m_ACircle->getComponent<CShape>()->setFillColor(sf::Color::White);
+    m_ACircle->getComponent<Transform>()->setPosition(sf::Vector2f(65.f, 475.f));
+    m_ACircle->getComponent<Transform>()->setScale(sf::Vector2f(4.f, 4));
 
-    //Waypoints
-    m_waypoints.push_back(sf::Vector2f(400.f, 150.f));
-    m_waypoints.push_back(sf::Vector2f(700.f, 300.f));
-    m_waypoints.push_back(sf::Vector2f(1000.f, 150.f));
-    m_waypoints.push_back(sf::Vector2f(1200.f, 500.f));
+    //Cargar la textura para el actor
+    if (!resourceMan.loadTexture("Sprites/yoshi", "png")) {
+      MESSAGE("BaseApp", "Init", "Can't load the texture");
+    }
+
+    m_ACircle->setTexture(resourceMan.getTexture("Sprites/yoshi"));
+
+    // Inicializar los waypoints para RedShell
+    m_waypoints.push_back(sf::Vector2f(65.f, 200.f));
+    m_waypoints.push_back(sf::Vector2f(95.f, 120.f));
+    m_waypoints.push_back(sf::Vector2f(150.f, 100.f));
+    m_waypoints.push_back(sf::Vector2f(850.f, 100.f));
+    m_waypoints.push_back(sf::Vector2f(950.f, 110.f));
+    m_waypoints.push_back(sf::Vector2f(975.f, 175.f));
+    m_waypoints.push_back(sf::Vector2f(975.f, 400.f));
+    m_waypoints.push_back(sf::Vector2f(925.f, 475.f));
+    m_waypoints.push_back(sf::Vector2f(445.f, 475.f));
+    m_waypoints.push_back(sf::Vector2f(425.f, 675.f));
+    m_waypoints.push_back(sf::Vector2f(475.f, 700.f));
+    m_waypoints.push_back(sf::Vector2f(1175.f, 700.f));
+    m_waypoints.push_back(sf::Vector2f(1250.f, 725.f));
+    m_waypoints.push_back(sf::Vector2f(1250.f, 925.f));
+    m_waypoints.push_back(sf::Vector2f(1175.f, 975.f));
+    m_waypoints.push_back(sf::Vector2f(650.f, 975.f));
+
+    m_waypoints.push_back(sf::Vector2f(250.f, 975.f));
+    m_waypoints.push_back(sf::Vector2f(150.f, 975.f));
+    m_waypoints.push_back(sf::Vector2f(100.f, 960.f));
+    m_waypoints.push_back(sf::Vector2f(65.f, 940.f));
+
+
+
+    // Crear marcadores visuales para cada waypoint
+    for (const auto& wp : m_waypoints) {
+      auto marker = EngineUtilities::MakeShared<CShape>();
+      marker->createShape(ShapeType::CIRCLE);
+      marker->setFillColor(sf::Color::Yellow);
+      marker->setPosition(wp);
+      marker->setScale(sf::Vector2f(1.f, 1.f)); 
+
+      m_waypointMarkers.push_back(marker);
+    }
+
+
+  }
+  else {
+    ERROR("BaseApp", "init","Failed to create Circle Actor, chek memory allocation");
+    return false;
   }
 
   return true;
@@ -95,42 +148,52 @@ BaseApp::init() {
  */
 void
 BaseApp::update() {
+  // Validar que la ventana está activa
   if (!m_windowPtr.isNull()) {
     m_windowPtr->update();
   }
 
-  if (!m_ACircle.isNull() && !m_waypoints.empty()) {
+  //Actualizar el actor Track
+  if (!m_Track.isNull()) {
+    m_Track->update(m_windowPtr->deltaTime.asSeconds());
+  }
+
+  // Actualizar el actor si no es nulo
+  if (!m_ACircle.isNull()) {
     m_ACircle->update(m_windowPtr->deltaTime.asSeconds());
 
-    // Obtener el destino actual del waypoint
-    sf::Vector2f targetPos = m_waypoints[m_currentWaypointIndex];
+    // Solo ejecutar si hay waypoints definidos
+    if (!m_waypoints.empty()) {
+      // Obtener el destino actual
+      sf::Vector2f targetPos = m_waypoints[m_currentWaypointIndex];
 
-    // Obtener posición actual del actor
-    sf::Vector2f currentPos = m_ACircle->getComponent<Transform>()->getPosition();
+      // Obtener posición actual del actor
+      sf::Vector2f currentPos = m_ACircle->getComponent<Transform>()->getPosition();
 
-    // Calcular distancia al waypoint
-    float dx = targetPos.x - currentPos.x;
-    float dy = targetPos.y - currentPos.y;
-    float distance = std::sqrt(dx * dx + dy * dy);
+      // Calcular distancia al waypoint
+      float dx = targetPos.x - currentPos.x;
+      float dy = targetPos.y - currentPos.y;
+      float distance = std::sqrt(dx * dx + dy * dy);
 
-    // Si llegó al waypoint actual, pasar al siguiente
-    if (distance < 10.0f) {
-      m_currentWaypointIndex++;
-      if (m_currentWaypointIndex >= static_cast<int>(m_waypoints.size())) {
-        m_currentWaypointIndex = 0; // Volver al inicio (comportamiento cíclico)
+      // Si llegó al waypoint actual, pasar al siguiente
+      if (distance < 10.0f) {
+        m_currentWaypointIndex++;
+        if (m_currentWaypointIndex >= static_cast<int>(m_waypoints.size())) {
+          m_currentWaypointIndex = 0; // Comportamiento cíclico
+        }
       }
+
+      // Moverse hacia el waypoint actual
+      m_ACircle->getComponent<Transform>()->seek(
+        m_waypoints[m_currentWaypointIndex],
+        200.0f,
+        m_windowPtr->deltaTime.asSeconds(),
+        10.0f
+      );
     }
 
-    // Buscar hacia el waypoint actual
-    m_ACircle->getComponent<Transform>()->seek(
-      m_waypoints[m_currentWaypointIndex],
-      200.0f,
-      m_windowPtr->deltaTime.asSeconds(),
-      10.0f
-    );
   }
 }
-
 
 /**
  * @brief Renders the current frame.
@@ -145,12 +208,22 @@ BaseApp::render() {
 
   m_windowPtr->clear();
 
+  // Renderizar primero la pista
+  if (!m_Track.isNull()) {
+    m_Track->getComponent<CShape>()->render(m_windowPtr);
+  }
+
+  // Dibujar marcadores de waypoints
+  for (const auto& marker : m_waypointMarkers) {
+    marker->render(m_windowPtr);
+  }
+
   if (m_shapePtr) {
     m_shapePtr->render(m_windowPtr);
   }
 
   if (!m_ACircle.isNull()) {
-    m_ACircle->render(m_windowPtr);
+    m_ACircle->getComponent<CShape>()->render(m_windowPtr);
   }
 
   m_windowPtr->display();

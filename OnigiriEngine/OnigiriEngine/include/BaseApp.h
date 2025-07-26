@@ -67,10 +67,10 @@ private:
   EngineUtilities::TSharedPointer<Window> m_windowPtr;   ///< Pointer to custom Window class using smart pointer.
   EngineUtilities::TSharedPointer<CShape> m_shapePtr;    ///< Pointer to custom shape class using smart pointer.
   EngineUtilities::TSharedPointer<Actor> m_ACircle;
-
-
-
+  EngineUtilities::TSharedPointer<Actor> m_Track;
 
   std::vector<sf::Vector2f> m_waypoints; ///< Lista de posiciones a seguir por el actor.
   int m_currentWaypointIndex = 0;        ///< Índice del waypoint actual.
+
+  std::vector<EngineUtilities::TSharedPointer<CShape>> m_waypointMarkers;
 };

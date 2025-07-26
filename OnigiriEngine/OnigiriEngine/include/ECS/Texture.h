@@ -21,10 +21,10 @@ public:
   start() override {};
 
   void
-  update(float deltaTime) override;
+  update(float deltaTime) override {};
 
   void
-  render(const EngineUtilities::TSharedPointer<Window>& window) override;
+  render(const EngineUtilities::TSharedPointer<Window>& window) override {};
 
   void
   destroy() override {};
@@ -33,6 +33,8 @@ public:
   getTexture() {
     return m_texture;
   }
+
+
 
 private:
   sf::Texture m_texture;

@@ -6,12 +6,13 @@
  */
 
 #include "Prerequisites.h"
-#include "Memory/TSharedPointer.h"
-#include "Memory/TUniquePtr.h"
+//#include "Memory/TSharedPointer.h"
+//#include "Memory/TUniquePtr.h"
 #include "ECS/Component.h"
+#include "ECS\Texture.h"
 
 class Window;
-class Texture;
+//class Texture;
 
 /**
  * @class CShape
@@ -118,6 +119,6 @@ public:
 
 private:
   EngineUtilities::TSharedPointer<sf::Shape> m_shapePtr; ///< Smart pointer to the SFML shape.
-  ShapeType m_shapeType = ShapeType::EMPTY;              ///< Type of the current shape.
-  sf::VertexArray* m_line = nullptr;                     ///< Reserved for line shapes (optional).
+  ShapeType m_shapeType;              ///< Type of the current shape.
+  sf::VertexArray* m_line;                     ///< Reserved for line shapes (optional).
 };
