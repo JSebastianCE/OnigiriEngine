@@ -130,8 +130,6 @@ BaseApp::init() {
 
       m_waypointMarkers.push_back(marker);
     }
-
-
   }
   else {
     ERROR("BaseApp", "init","Failed to create Circle Actor, chek memory allocation");
@@ -152,6 +150,8 @@ BaseApp::update() {
   if (!m_windowPtr.isNull()) {
     m_windowPtr->update();
   }
+
+  ImGui::ShowDemoWindow();
 
   //Actualizar el actor Track
   if (!m_Track.isNull()) {
@@ -180,6 +180,8 @@ BaseApp::update() {
         m_currentWaypointIndex++;
         if (m_currentWaypointIndex >= static_cast<int>(m_waypoints.size())) {
           m_currentWaypointIndex = 0; // Comportamiento cíclico
+
+
         }
       }
 
@@ -191,6 +193,8 @@ BaseApp::update() {
         10.0f
       );
     }
+
+    //
 
   }
 }
@@ -225,7 +229,7 @@ BaseApp::render() {
   if (!m_ACircle.isNull()) {
     m_ACircle->getComponent<CShape>()->render(m_windowPtr);
   }
-
+  m_windowPtr->render();
   m_windowPtr->display();
 }
 

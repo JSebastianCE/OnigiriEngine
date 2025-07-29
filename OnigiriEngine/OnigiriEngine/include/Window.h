@@ -83,7 +83,8 @@ public:
   void
   update();
 
-
+  void
+  render();
   /**
    * @brief Releases the window resources.
    *

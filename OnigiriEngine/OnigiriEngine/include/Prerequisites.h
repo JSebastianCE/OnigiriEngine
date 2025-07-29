@@ -19,7 +19,8 @@
 #include <Memory/TStaticPtr.h>
 #include <Memory/TUniquePtr.h>
 
-
+#include <imgui.h>
+#include <imgui-SFML.h>
 
 // === Third Party Libraries ===
 #include <SFML/Graphics.hpp> ///< SFML graphics module.
