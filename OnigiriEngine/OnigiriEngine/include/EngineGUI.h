@@ -34,12 +34,11 @@ public:
   void
   processEvent(const sf::Window& window, const sf::Event& event);
 
-  void setupDarkGUIStyle();
+  void 
+  setupDarkGUIStyle();
 
-  void barMenu();
-
-
-
+  void 
+  barMenu();
 
 
 private:
