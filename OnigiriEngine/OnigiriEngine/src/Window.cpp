@@ -1,5 +1,5 @@
 #include "Window.h"
-#include <BaseApp.h>
+#include <EngineGUI.h>
 
 /**
  * @class Window
@@ -18,15 +18,13 @@
   * @param title Title of the window.
   */
 Window::Window(int width, int height, const std::string& title) {
- // Crear ventana con SFML 3
+  // Crear ventana con SFML 3
   m_windowPtr = EngineUtilities::MakeUnique<sf::RenderWindow>(
     sf::VideoMode({ static_cast<unsigned int>(width),
                     static_cast<unsigned int>(height) }),
     title,
     sf::Style::Default
   );
-
-
 
   if (!m_windowPtr.isNull()) {
     m_windowPtr->setFramerateLimit(60);
@@ -36,15 +34,12 @@ Window::Window(int width, int height, const std::string& title) {
     ERROR("Window", "Window", "Failed to create window");
   }
 
-  //Initialize the ImGui Resource
-  ImGui::SFML::Init(*m_windowPtr);
 }
 
 /**
  * @brief Destroys the Window object and safely releases its resources.
  */
 Window::~Window() {
-  ImGui::SFML::Shutdown();
   m_windowPtr.release();
   //SAFE_PTR_RELEASE(window.h);
 }
@@ -55,15 +50,14 @@ Window::~Window() {
  * Processes the event queue to detect and handle user actions like closing the window.
  */
 void 
-Window::handleEvents()
-{
+Window::handleEvents(EngineGUI& engineGUI){
   //while (m_windowPtr->isOpen())
   //{
   //}
     // Process events
   while (const std::optional event = m_windowPtr->pollEvent())
   {
-    ImGui::SFML::ProcessEvent(*m_windowPtr, *event);
+    engineGUI.processEvent(*m_windowPtr, *event);
     // Close window: exit
     if (event->is<sf::Event::Closed>())
       m_windowPtr->close();
@@ -135,14 +129,12 @@ void
 Window::update() {
   //Almacenar el deltaTime una sola vez
   deltaTime = clock.restart();
-
-  //Use deltaTime for update InGui
-  ImGui::SFML::Update(*m_windowPtr, deltaTime);
+ 
 }
 
 void
 Window::render() {
-  ImGui::SFML::Render(*m_windowPtr);
+  
 }
 
 
@@ -151,6 +143,5 @@ Window::render() {
  */
 void 
 Window::destroy() {
-  ImGui::SFML::Shutdown();
   m_windowPtr.release();
 }

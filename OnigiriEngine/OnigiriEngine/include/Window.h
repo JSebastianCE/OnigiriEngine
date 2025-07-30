@@ -1,8 +1,8 @@
 #pragma once
 #include "Prerequisites.h"
-#include "Memory/TSharedPointer.h"
-#include "Memory/TUniquePtr.h"
+#include "EngineGUI.h"
 
+class EngineGUI;
 
 /**
  * @file Window.h
@@ -14,7 +14,7 @@
   * @brief Encapsulates an SFML window, handling initialization, events, rendering, and cleanup.
   */
 class
-Window {
+Window{
 public:
   /**
    * @brief Default constructor.
@@ -37,14 +37,16 @@ public:
    */
   ~Window();
 
+  
+  void 
+  handleEvents(EngineGUI& engineGUI);
+
   /**
    * @brief Handles window events (e.g., close, input).
    *
    * Processes all SFML events in the queue.
    */
-  void
-  handleEvents();
-
+  
   /**
    * @brief Checks if the window is currently open.
    *
@@ -94,9 +96,9 @@ public:
   destroy();
 
 private:
-  EngineUtilities::TUniquePtr<sf::RenderWindow> m_windowPtr; ///< Unique pointer to the SFML render window.
   sf::View m_view; ///< View used for rendering (not currently exposed).
 public:
+  EngineUtilities::TUniquePtr<sf::RenderWindow> m_windowPtr; ///< Unique pointer to the SFML render window.
   sf::Time deltaTime;
   sf::Clock clock;
 };

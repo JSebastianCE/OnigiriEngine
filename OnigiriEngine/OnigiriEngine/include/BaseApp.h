@@ -5,10 +5,10 @@
  * @brief Defines the BaseApp class, which manages the main application loop and rendering.
  */
 
-#include "Prerequisites.h"
 #include <Window.h>
 #include "CShape.h" // Agregado para que coincida con el código del profesor
 #include "ECS/Actor.h"
+#include "EngineGUI.h"
 
 #include <vector>
 
@@ -73,4 +73,6 @@ private:
   int m_currentWaypointIndex = 0;        ///< Índice del waypoint actual.
 
   std::vector<EngineUtilities::TSharedPointer<CShape>> m_waypointMarkers;
+
+  EngineGUI m_engineGUI;
 };

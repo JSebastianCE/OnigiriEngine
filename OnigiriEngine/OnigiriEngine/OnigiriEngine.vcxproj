@@ -28,6 +28,7 @@
     <ClCompile Include="src\BaseApp.cpp" />
     <ClCompile Include="src\CShape.cpp" />
     <ClCompile Include="src\ECS\Actor.cpp" />
+    <ClCompile Include="src\EngineGUI.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\Transform.cpp" />
@@ -50,6 +51,7 @@
     <ClInclude Include="include\ECS\Entity.h" />
     <ClInclude Include="include\ECS\Texture.h" />
     <ClInclude Include="include\ECS\Transform.h" />
+    <ClInclude Include="include\EngineGUI.h" />
     <ClInclude Include="include\Memory\TSharedPointer.h" />
     <ClInclude Include="include\Memory\TStaticPtr.h" />
     <ClInclude Include="include\Memory\TUniquePtr.h" />

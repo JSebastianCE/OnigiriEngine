@@ -63,6 +63,9 @@
     <ClCompile Include="..\ThirdParties\imgui-sfml-master\imgui-SFML.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
+    <ClCompile Include="src\EngineGUI.cpp">
+      <Filter>Archivos de recursos</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Prerequisites.h">
@@ -136,6 +139,9 @@
     </ClInclude>
     <ClInclude Include="..\ThirdParties\imgui-sfml-master\imstb_truetype.h">
       <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\EngineGUI.h">
+      <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

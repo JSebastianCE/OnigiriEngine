@@ -1,6 +1,6 @@
 #include "BaseApp.h"
-//#include <ECS/Actor.h>
 #include "ResourceManager.h"
+#include "EngineGUI.h"
 
 /**
  * @file BaseApp.cpp
@@ -31,7 +31,7 @@ BaseApp::run() {
   }
 
   while (m_windowPtr->isOpen()) {
-    m_windowPtr->handleEvents();
+    m_windowPtr->handleEvents(m_engineGUI);
     update();
     render();
   }
@@ -57,8 +57,8 @@ BaseApp::init() {
     return false;
   }
 
-
-
+  //Initialize ImGui
+  m_engineGUI.init(m_windowPtr);
 
   // Crear pista de carreras
   m_Track = EngineUtilities::MakeShared<Actor>("Track Actor");
@@ -77,9 +77,6 @@ BaseApp::init() {
 
   }
  
-
-
-
   //Create Circle Actor
   m_ACircle = EngineUtilities::MakeShared<Actor>("yoshi");
   if (m_ACircle) {
@@ -150,6 +147,8 @@ BaseApp::update() {
   if (!m_windowPtr.isNull()) {
     m_windowPtr->update();
   }
+  //Update ImGui
+  m_engineGUI.update(m_windowPtr, m_windowPtr->deltaTime);
 
   ImGui::ShowDemoWindow();
 
@@ -193,9 +192,6 @@ BaseApp::update() {
         10.0f
       );
     }
-
-    //
-
   }
 }
 
@@ -230,6 +226,10 @@ BaseApp::render() {
     m_ACircle->getComponent<CShape>()->render(m_windowPtr);
   }
   m_windowPtr->render();
+
+  //Render Imgui
+  m_engineGUI.render(m_windowPtr);
+
   m_windowPtr->display();
 }
 
@@ -241,6 +241,8 @@ BaseApp::render() {
  */
 void
 BaseApp::destroy() {
+  m_engineGUI.destroy();
+
   // m_shapePtr.Reset(); // Not necessary if using smart pointers correctly
   // m_windowPtr.Reset(); // Cleanup handled automatically
 }
