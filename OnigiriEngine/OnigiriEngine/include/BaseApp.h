@@ -64,6 +64,8 @@ public:
   destroy();
 
 private:
+  std::vector<EngineUtilities::TSharedPointer<Actor>> m_actors;
+
   EngineUtilities::TSharedPointer<Window> m_windowPtr;   ///< Pointer to custom Window class using smart pointer.
   EngineUtilities::TSharedPointer<CShape> m_shapePtr;    ///< Pointer to custom shape class using smart pointer.
   EngineUtilities::TSharedPointer<Actor> m_ACircle;

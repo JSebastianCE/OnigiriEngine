@@ -1,6 +1,7 @@
 #include "BaseApp.h"
 #include "ResourceManager.h"
 #include "EngineGUI.h"
+#include <A_Racer.h>
 
 /**
  * @file BaseApp.cpp
@@ -77,7 +78,7 @@ BaseApp::init() {
 
   }
  
-  //Create Circle Actor
+  //Create Yoshi Actor
   m_ACircle = EngineUtilities::MakeShared<Actor>("yoshi");
   if (m_ACircle) {
     m_ACircle->getComponent<CShape>()->createShape(CIRCLE);
@@ -85,12 +86,16 @@ BaseApp::init() {
     m_ACircle->getComponent<Transform>()->setPosition(sf::Vector2f(65.f, 475.f));
     m_ACircle->getComponent<Transform>()->setScale(sf::Vector2f(4.f, 4));
 
+
     //Cargar la textura para el actor
     if (!resourceMan.loadTexture("Sprites/yoshi", "png")) {
       MESSAGE("BaseApp", "Init", "Can't load the texture");
     }
 
     m_ACircle->setTexture(resourceMan.getTexture("Sprites/yoshi"));
+
+    //Add Actor to he line list of actors
+    m_actors.push_back(m_ACircle);
 
     // Inicializar los waypoints para RedShell
     m_waypoints.push_back(sf::Vector2f(65.f, 200.f));
@@ -126,6 +131,27 @@ BaseApp::init() {
       marker->setScale(sf::Vector2f(1.f, 1.f)); 
 
       m_waypointMarkers.push_back(marker);
+
+
+    // Crear NPC corredor
+    auto npc1 = EngineUtilities::MakeShared<A_Racer>("NPC_1", 1);  // Decidir por donde empieza (quizas uso como item) 
+    npc1->setWaypoints(m_waypoints);
+    npc1->getComponent<CShape>()->createShape(CIRCLE);
+    npc1->getComponent<CShape>()->setFillColor(sf::Color::White);
+    npc1->getComponent<Transform>()->setScale(sf::Vector2f(3.f, 3.f));
+    npc1->getComponent<Transform>()->setPosition(sf::Vector2f(65.f, 475.f));
+    npc1->setSpeed(400.0f);
+
+    // Cargar textura para NPC
+    if (!resourceMan.loadTexture("Sprites/redshell", "png")) {
+      MESSAGE("BaseApp", "Init", "Can't load NPC texture");
+    }
+    npc1->setTexture(resourceMan.getTexture("Sprites/redshell"));
+
+    // Agregar al vector de actores para actualización y render
+    m_actors.push_back(npc1);
+
+
     }
   }
   else {
@@ -149,6 +175,7 @@ BaseApp::update() {
   }
   //Update ImGui
   m_engineGUI.update(m_windowPtr, m_windowPtr->deltaTime);
+  //m_engineGUI.outliner(m_actors);
 
   ImGui::ShowDemoWindow();
 
@@ -158,8 +185,12 @@ BaseApp::update() {
   }
 
   // Actualizar el actor si no es nulo
-  if (!m_ACircle.isNull()) {
-    m_ACircle->update(m_windowPtr->deltaTime.asSeconds());
+  for (auto& actor : m_actors) {
+    if (!actor.isNull()) {
+      actor->update(m_windowPtr->deltaTime.asSeconds());
+    }
+  }
+
 
     // Solo ejecutar si hay waypoints definidos
     if (!m_waypoints.empty()) {
@@ -193,7 +224,8 @@ BaseApp::update() {
       );
     }
   }
-}
+
+
 
 /**
  * @brief Renders the current frame.
@@ -222,9 +254,14 @@ BaseApp::render() {
     m_shapePtr->render(m_windowPtr);
   }
 
-  if (!m_ACircle.isNull()) {
-    m_ACircle->getComponent<CShape>()->render(m_windowPtr);
+  //Renderizado de todos los actores
+  for (auto& actor : m_actors) {
+    if (!actor.isNull()) {
+      actor->render(m_windowPtr);
+    }
   }
+
+
   m_windowPtr->render();
 
   //Render Imgui

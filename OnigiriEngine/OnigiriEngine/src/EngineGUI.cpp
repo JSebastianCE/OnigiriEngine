@@ -118,7 +118,6 @@ EngineGUI::setupDarkGUIStyle() {
 }
 
 
-
 void 
 EngineGUI::barMenu() {
   if (ImGui::BeginMainMenuBar()) {
@@ -176,6 +175,8 @@ EngineGUI::barMenu() {
     ImGui::EndMainMenuBar();
   }
 }
+
+
 
 
 void

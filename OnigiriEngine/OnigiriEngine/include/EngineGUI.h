@@ -1,5 +1,6 @@
 #pragma once
 #include "Prerequisites.h"
+#include <ECS/Actor.h>
 
 //Imgui
 //#include <imgui.h>
@@ -40,6 +41,11 @@ public:
   void 
   barMenu();
 
+
+  
+
+  //void
+ // outliner(const std::vector<EngineUtilities::TSharedPointer<Actor>>& actor);
 
 private:
 
