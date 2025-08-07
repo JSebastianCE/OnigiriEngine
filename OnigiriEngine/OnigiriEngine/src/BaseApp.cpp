@@ -84,7 +84,7 @@ BaseApp::init() {
     m_ACircle->getComponent<CShape>()->createShape(CIRCLE);
     m_ACircle->getComponent<CShape>()->setFillColor(sf::Color::White);
     m_ACircle->getComponent<Transform>()->setPosition(sf::Vector2f(65.f, 475.f));
-    m_ACircle->getComponent<Transform>()->setScale(sf::Vector2f(4.f, 4));
+    m_ACircle->getComponent<Transform>()->setScale(sf::Vector2f(3.f, 3));
 
 
     //Cargar la textura para el actor
@@ -133,23 +133,54 @@ BaseApp::init() {
       m_waypointMarkers.push_back(marker);
 
 
-    // Crear NPC corredor
-    auto npc1 = EngineUtilities::MakeShared<A_Racer>("NPC_1", 1);  // Decidir por donde empieza (quizas uso como item) 
+    // Crear NPC Mario
+    auto npc1 = EngineUtilities::MakeShared<A_Racer>("NPC_1", 1);   
     npc1->setWaypoints(m_waypoints);
     npc1->getComponent<CShape>()->createShape(CIRCLE);
     npc1->getComponent<CShape>()->setFillColor(sf::Color::White);
     npc1->getComponent<Transform>()->setScale(sf::Vector2f(3.f, 3.f));
     npc1->getComponent<Transform>()->setPosition(sf::Vector2f(65.f, 475.f));
-    npc1->setSpeed(400.0f);
+    npc1->setSpeed(280.0f);
 
     // Cargar textura para NPC
-    if (!resourceMan.loadTexture("Sprites/redshell", "png")) {
+    if (!resourceMan.loadTexture("Sprites/Mario", "png")) {
       MESSAGE("BaseApp", "Init", "Can't load NPC texture");
     }
-    npc1->setTexture(resourceMan.getTexture("Sprites/redshell"));
+    npc1->setTexture(resourceMan.getTexture("Sprites/Mario"));
 
     // Agregar al vector de actores para actualización y render
     m_actors.push_back(npc1);
+
+
+
+    // Crear NPC Luigi
+    auto npc2 = EngineUtilities::MakeShared<A_Racer>("NPC_2", 1); 
+    npc2->setWaypoints(m_waypoints);
+    npc2->getComponent<CShape>()->createShape(CIRCLE);
+    npc2->getComponent<CShape>()->setFillColor(sf::Color::White);
+    npc2->getComponent<Transform>()->setScale(sf::Vector2f(3.f, 3.f));
+    npc2->getComponent<Transform>()->setPosition(sf::Vector2f(65.f, 475.f));
+    npc2->setSpeed(250.0f);
+
+    // Cargar textura para NPC
+    if (!resourceMan.loadTexture("Sprites/Luigi", "png")) {
+      MESSAGE("BaseApp", "Init", "Can't load NPC texture");
+    }
+    npc2->setTexture(resourceMan.getTexture("Sprites/Luigi"));
+
+    // Agregar al vector de actores para actualización y render
+    m_actors.push_back(npc2);
+
+
+
+
+
+
+
+
+
+
+
 
 
     }
@@ -210,8 +241,6 @@ BaseApp::update() {
         m_currentWaypointIndex++;
         if (m_currentWaypointIndex >= static_cast<int>(m_waypoints.size())) {
           m_currentWaypointIndex = 0; // Comportamiento cíclico
-
-
         }
       }
 
@@ -222,6 +251,7 @@ BaseApp::update() {
         m_windowPtr->deltaTime.asSeconds(),
         10.0f
       );
+
     }
   }
 

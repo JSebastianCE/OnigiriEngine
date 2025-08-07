@@ -121,4 +121,6 @@ private:
   EngineUtilities::TSharedPointer<sf::Shape> m_shapePtr; ///< Smart pointer to the SFML shape.
   ShapeType m_shapeType;              ///< Type of the current shape.
   sf::VertexArray* m_line;                     ///< Reserved for line shapes (optional).
+
+
 };

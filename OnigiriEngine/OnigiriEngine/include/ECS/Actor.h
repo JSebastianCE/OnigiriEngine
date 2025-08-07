@@ -74,6 +74,7 @@ private:
    * @brief Nombre del actor.
    */
   std::string m_name = "Actor";
+  //std::string getName() const { return m_name; }
 
 };
 
@@ -92,3 +93,4 @@ inline EngineUtilities::TSharedPointer<T> Actor::getComponent() {
   }
   return EngineUtilities::TSharedPointer<T>();
 }
+
