@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "ECS/Actor.h"
 #include <vector>
@@ -9,36 +9,46 @@
  */
 class A_Racer : public Actor {
 public:
-  /**
-   * @brief Constructor del NPC con nombre y posición inicial.
-   */
+
   A_Racer(const std::string& name, int initPlace);
 
-  /**
-   * @brief Actualiza la lógica del NPC cada frame.
-   * @param deltaTime Tiempo transcurrido desde el último frame.
-   */
   void 
   update(float deltaTime) override;
 
-  /**
-   * @brief Establece la lista de waypoints que debe seguir.
-   */
   void 
   setWaypoints(const std::vector<sf::Vector2f>& waypoints);
 
-  /**
-   * @brief Reinicia el NPC a su punto inicial.
-   */
-  void 
+  void
   resetPosition();
 
-  void
+  void 
   setSpeed(float newSpeed);
+
+  int   
+  getCurrentWaypointIndex() const { return currentWaypointIndex; }
+
+  float 
+  getDistanceToNextWaypoint() const;
+
+
+
+  int  
+  getLap() const { return lapCount; }
+
+  bool  
+  isFinished() const { return finished; }
+
+  void  
+  markFinished(bool v) { finished = v; }
+
 
 private:
   int initialPositionIndex = 0;
   int currentWaypointIndex = 0;
+
+  int  lapCount = 0;
+  int  prevWaypointIndex = 0;
+  bool finished = false;
 
   float speed = 100.0f;
   float maxSpeed = 200.0f;

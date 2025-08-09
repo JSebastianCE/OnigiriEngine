@@ -77,4 +77,19 @@ private:
   std::vector<EngineUtilities::TSharedPointer<CShape>> m_waypointMarkers;
 
   EngineGUI m_engineGUI;
+
+private:
+  // ...
+  int  m_totalLaps = 3;
+
+  // Estado del jugador (Yoshi)
+  int  m_playerLapCount = 0;
+  int  m_prevPlayerWaypointIndex = 0;
+  bool m_playerFinished = false;
+
+  // Meta y final
+  bool m_raceFrozen = false;
+  std::vector<std::string> m_finishOrder; // nombres en orden de llegada (incluye player)
+  std::string m_winnerName;
+
 };

@@ -1,4 +1,4 @@
-#include "CShape.h"
+ï»¿#include "CShape.h"
 #include "Window.h"
 #include "Memory/TUniquePtr.h"
 #include <Memory/TSharedPointer.h>
@@ -69,7 +69,7 @@ CShape::CShape(ShapeType shapeType)
 
 void 
 CShape::start() {
-  // Tu lógica aquí
+  // Tu lÃ³gica aquÃ­
 }
 
 void 
@@ -181,6 +181,7 @@ CShape::setTexture(const EngineUtilities::TSharedPointer<Texture>& texture) {
     m_shapePtr->setTexture(&texture->getTexture());
   }
 }
+
 
 
 

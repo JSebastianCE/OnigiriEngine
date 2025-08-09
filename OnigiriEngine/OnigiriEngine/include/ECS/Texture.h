@@ -34,10 +34,11 @@ public:
     return m_texture;
   }
 
-
+  
 
 private:
   sf::Texture m_texture;
   std::string m_textureName;
   std::string m_extension;
+
 };

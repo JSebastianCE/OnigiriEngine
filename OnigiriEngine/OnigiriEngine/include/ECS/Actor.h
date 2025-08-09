@@ -1,4 +1,4 @@
-#pragma once
+Ôªø#pragma once
 #include "..//Prerequisites.h"
 #include "Entity.h"
 #include "CShape.h"
@@ -10,79 +10,39 @@
  * @brief Representa una entidad activa del mundo del juego que puede tener componentes, ser actualizada, renderizada y destruida.
  * Hereda de Entity.
  */
-class
-Actor : public Entity {
+class Actor : public Entity {
 public:
-  /**
-   * @brief Constructor por defecto del Actor.
-   */
-  Actor() = default;
 
-  /**
-   * @brief Constructor que inicializa el Actor con un nombre.
-   * @param actorName Nombre a asignar al actor.
-   */
+  Actor() = default;
   Actor(const std::string& actorName);
 
-  /**
-   * @brief Destructor virtual por defecto del Actor.
-   */
-  virtual
-  ~Actor() = default;
+  virtual ~Actor() = default;
 
-  /**
-   * @brief MÈtodo que se llama al iniciar el Actor. Puede usarse para inicializar componentes.
-   */
-  void
+  void 
   start() override;
 
-  /**
-   * @brief MÈtodo que se llama cada frame para actualizar el estado del Actor.
-   * @param deltaTime Tiempo transcurrido desde la ˙ltima actualizaciÛn.
-   */
-  void
+  void 
   update(float deltaTime) override;
 
-  /**
-   * @brief Renderiza el Actor en la ventana proporcionada.
-   * @param window Referencia compartida a la ventana donde se renderiza el actor.
-   */
-  void
+  void 
   render(const EngineUtilities::TSharedPointer<Window>& window) override;
 
-  /**
-   * @brief MÈtodo que se llama para destruir el Actor y limpiar sus recursos.
-   */
-  void
+  void 
   destroy() override;
 
-  void
+  void 
   setTexture(const EngineUtilities::TSharedPointer<Texture>& texture);
 
+  // ‚¨áÔ∏è NUEVO: getter para el nombre (usado en el ranking/ImGui)
+  const std::string& getName() const { return m_name; }
 
-
-  /**
-   * @brief Obtiene un componente del tipo especificado si existe en el Actor.
-   * @tparam T Tipo del componente a buscar.
-   * @return Referencia compartida al componente del tipo T si se encuentra; nullptr en caso contrario.
-   */
   template <typename T>
   EngineUtilities::TSharedPointer<T> getComponent();
 
 private:
-  /**
-   * @brief Nombre del actor.
-   */
   std::string m_name = "Actor";
-  //std::string getName() const { return m_name; }
-
 };
 
-/**
- * @brief ImplementaciÛn de la plantilla getComponent.
- * @tparam T Tipo del componente a buscar.
- * @return Referencia compartida al componente del tipo T si se encuentra; nullptr en caso contrario.
- */
 template <typename T>
 inline EngineUtilities::TSharedPointer<T> Actor::getComponent() {
   for (auto& component : components) {
@@ -93,4 +53,3 @@ inline EngineUtilities::TSharedPointer<T> Actor::getComponent() {
   }
   return EngineUtilities::TSharedPointer<T>();
 }
-
