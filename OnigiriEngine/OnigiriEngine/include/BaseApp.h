@@ -92,4 +92,7 @@ private:
   std::vector<std::string> m_finishOrder; // nombres en orden de llegada (incluye player)
   std::string m_winnerName;
 
+  sf::Clock m_raceClock;   // Para medir el tiempo de carrera
+  float m_elapsedTime = 0; // Tiempo acumulado en segundos
+  bool m_raceFinished = false; // Indica si la carrera terminó
 };

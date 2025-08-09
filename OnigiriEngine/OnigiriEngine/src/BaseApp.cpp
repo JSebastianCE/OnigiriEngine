@@ -38,7 +38,7 @@ BaseApp::init() {
   if (m_Track) {
     m_Track->getComponent<CShape>()->createShape(RECTANGLE);
     m_Track->getComponent<CShape>()->setFillColor(sf::Color::White);
-    m_Track->getComponent<Transform>()->setPosition(sf::Vector2f(0.f, 0.f));
+    m_Track->getComponent<Transform>()->setPosition(sf::Vector2f(350.f, 0.f));
     m_Track->getComponent<Transform>()->setScale(sf::Vector2f(17.0f, 22.0f));
 
     if (!resourceMan.loadTexture("Sprites/Track", "png")) {
@@ -56,7 +56,7 @@ BaseApp::init() {
 
   m_ACircle->getComponent<CShape>()->createShape(CIRCLE);
   m_ACircle->getComponent<CShape>()->setFillColor(sf::Color::White);
-  m_ACircle->getComponent<Transform>()->setPosition(sf::Vector2f(65.f, 475.f));
+  m_ACircle->getComponent<Transform>()->setPosition(sf::Vector2f(415.f, 475.f));
   m_ACircle->getComponent<Transform>()->setScale(sf::Vector2f(3.f, 3));
 
   if (!resourceMan.loadTexture("Sprites/yoshi", "png")) {
@@ -66,26 +66,26 @@ BaseApp::init() {
   m_actors.push_back(m_ACircle);
 
   //  Waypoints
-  m_waypoints.push_back(sf::Vector2f(65.f, 200.f));
-  m_waypoints.push_back(sf::Vector2f(95.f, 120.f));
-  m_waypoints.push_back(sf::Vector2f(150.f, 100.f));
-  m_waypoints.push_back(sf::Vector2f(850.f, 100.f));
-  m_waypoints.push_back(sf::Vector2f(950.f, 110.f));
-  m_waypoints.push_back(sf::Vector2f(975.f, 175.f));
-  m_waypoints.push_back(sf::Vector2f(975.f, 400.f));
-  m_waypoints.push_back(sf::Vector2f(925.f, 475.f));
-  m_waypoints.push_back(sf::Vector2f(445.f, 475.f));
-  m_waypoints.push_back(sf::Vector2f(425.f, 675.f));
-  m_waypoints.push_back(sf::Vector2f(475.f, 700.f));
-  m_waypoints.push_back(sf::Vector2f(1175.f, 700.f));
-  m_waypoints.push_back(sf::Vector2f(1250.f, 725.f));
-  m_waypoints.push_back(sf::Vector2f(1250.f, 925.f));
-  m_waypoints.push_back(sf::Vector2f(1175.f, 975.f));
-  m_waypoints.push_back(sf::Vector2f(650.f, 975.f));
-  m_waypoints.push_back(sf::Vector2f(250.f, 975.f));
-  m_waypoints.push_back(sf::Vector2f(150.f, 975.f));
-  m_waypoints.push_back(sf::Vector2f(100.f, 960.f));
-  m_waypoints.push_back(sf::Vector2f(65.f, 495.f));
+  m_waypoints.push_back(sf::Vector2f(415.f, 200.f));
+  m_waypoints.push_back(sf::Vector2f(445.f, 120.f));
+  m_waypoints.push_back(sf::Vector2f(500.f, 100.f));
+  m_waypoints.push_back(sf::Vector2f(1200.f, 100.f));
+  m_waypoints.push_back(sf::Vector2f(1300.f, 110.f));
+  m_waypoints.push_back(sf::Vector2f(1325.f, 175.f));
+  m_waypoints.push_back(sf::Vector2f(1325.f, 400.f));
+  m_waypoints.push_back(sf::Vector2f(1275.f, 475.f));
+  m_waypoints.push_back(sf::Vector2f(795.f, 475.f));
+  m_waypoints.push_back(sf::Vector2f(775.f, 675.f));
+  m_waypoints.push_back(sf::Vector2f(825.f, 700.f));
+  m_waypoints.push_back(sf::Vector2f(1525.f, 700.f));
+  m_waypoints.push_back(sf::Vector2f(1600.f, 725.f));
+  m_waypoints.push_back(sf::Vector2f(1600.f, 925.f));
+  m_waypoints.push_back(sf::Vector2f(1525.f, 975.f));
+  m_waypoints.push_back(sf::Vector2f(1000.f, 975.f));
+  m_waypoints.push_back(sf::Vector2f(600.f, 975.f));
+  m_waypoints.push_back(sf::Vector2f(500.f, 975.f));
+  m_waypoints.push_back(sf::Vector2f(450.f, 960.f));
+  m_waypoints.push_back(sf::Vector2f(415.f, 495.f));
 
   // Marcadores visuales
   for (const auto& wp : m_waypoints) {
@@ -103,8 +103,8 @@ BaseApp::init() {
   npc1->getComponent<CShape>()->createShape(CIRCLE);
   npc1->getComponent<CShape>()->setFillColor(sf::Color::White);
   npc1->getComponent<Transform>()->setScale(sf::Vector2f(3.f, 3.f));
-  npc1->getComponent<Transform>()->setPosition(sf::Vector2f(65.f, 475.f));
-  npc1->setSpeed(480.0f);
+  npc1->getComponent<Transform>()->setPosition(sf::Vector2f(415.f, 475.f));
+  npc1->setSpeed(520.0f);
   if (!resourceMan.loadTexture("Sprites/Mario", "png")) {
     MESSAGE("BaseApp", "Init", "Can't load NPC texture");
   }
@@ -116,7 +116,7 @@ BaseApp::init() {
   npc2->getComponent<CShape>()->createShape(CIRCLE);
   npc2->getComponent<CShape>()->setFillColor(sf::Color::White);
   npc2->getComponent<Transform>()->setScale(sf::Vector2f(3.f, 3.f));
-  npc2->getComponent<Transform>()->setPosition(sf::Vector2f(65.f, 475.f));
+  npc2->getComponent<Transform>()->setPosition(sf::Vector2f(415.f, 475.f));
   npc2->setSpeed(500.0f);
   if (!resourceMan.loadTexture("Sprites/Luigi", "png")) {
     MESSAGE("BaseApp", "Init", "Can't load NPC texture");
@@ -124,8 +124,35 @@ BaseApp::init() {
   npc2->setTexture(resourceMan.getTexture("Sprites/Luigi"));
   m_actors.push_back(npc2);
 
+  auto npc3 = EngineUtilities::MakeShared<A_Racer>("Peach", 1);
+  npc3->setWaypoints(m_waypoints);
+  npc3->getComponent<CShape>()->createShape(CIRCLE);
+  npc3->getComponent<CShape>()->setFillColor(sf::Color::White);
+  npc3->getComponent<Transform>()->setScale(sf::Vector2f(3.f, 3.f));
+  npc3->getComponent<Transform>()->setPosition(sf::Vector2f(415.f, 475.f));
+  npc3->setSpeed(510.0f);
+  if (!resourceMan.loadTexture("Sprites/Peach", "png")) {
+    MESSAGE("BaseApp", "Init", "Can't load NPC texture");
+  }
+  npc3->setTexture(resourceMan.getTexture("Sprites/Peach"));
+  m_actors.push_back(npc3);
+
+  auto npc4 = EngineUtilities::MakeShared<A_Racer>("DK", 1);
+  npc4->setWaypoints(m_waypoints);
+  npc4->getComponent<CShape>()->createShape(CIRCLE);
+  npc4->getComponent<CShape>()->setFillColor(sf::Color::White);
+  npc4->getComponent<Transform>()->setScale(sf::Vector2f(3.f, 3.f));
+  npc4->getComponent<Transform>()->setPosition(sf::Vector2f(415.f, 475.f));
+  npc4->setSpeed(515.0f);
+  if (!resourceMan.loadTexture("Sprites/DK", "png")) {
+    MESSAGE("BaseApp", "Init", "Can't load NPC texture");
+  }
+  npc4->setTexture(resourceMan.getTexture("Sprites/DK"));
+  m_actors.push_back(npc4);
+
+
   // Estado de carrera
-  m_totalLaps = 3;
+  m_totalLaps = 4;
   m_currentWaypointIndex = 0;
   m_prevPlayerWaypointIndex = m_currentWaypointIndex;
   m_playerLapCount = 0;
@@ -134,15 +161,27 @@ BaseApp::init() {
   m_finishOrder.clear();
   m_winnerName.clear();
 
+  //Cronometro
+  m_raceClock.restart();
+  m_elapsedTime = 0;
+  m_raceFinished = false;
+
   return true;
 }
 
 void BaseApp::update() {
   if (!m_windowPtr.isNull()) m_windowPtr->update();
 
+  // Cronómetro: si la carrera no ha terminado, refresca el tiempo
+  if (!m_raceFinished) {
+    m_elapsedTime = m_raceClock.getElapsedTime().asSeconds();
+  }
+
+
+
   // GUI
   m_engineGUI.update(m_windowPtr, m_windowPtr->deltaTime);
-  ImGui::ShowDemoWindow(); 
+  //ImGui::ShowDemoWindow(); 
 
   // Se permite movimiento? (se congela cuando llega el 3.º)
   const bool allowMovement = !m_raceFrozen;
@@ -195,10 +234,15 @@ void BaseApp::update() {
       // mover hacia el waypoint
       m_ACircle->getComponent<Transform>()->seek(
         m_waypoints[m_currentWaypointIndex],
-        200.0f,
+        530.0f,
         m_windowPtr->deltaTime.asSeconds(),
         10.0f
       );
+
+      if (!m_raceFinished) {
+        m_elapsedTime = m_raceClock.getElapsedTime().asSeconds();
+      }
+
     }
 
     // distancia del jugador al siguiente (para ranking)
@@ -233,6 +277,7 @@ void BaseApp::update() {
     if (!m_raceFrozen && m_finishOrder.size() >= 3) {
       m_raceFrozen = true;
       m_winnerName = m_finishOrder.front();
+      m_raceFinished = true;         // ← detiene el cronómetro
     }
   }
 
@@ -285,6 +330,24 @@ void BaseApp::update() {
       if (m_finishOrder.size() >= 3) ImGui::Text("3) %s", m_finishOrder[2].c_str());
     }
 
+    ImGui::End();
+  }
+    // ===== HUD: Cronómetro =====
+  {
+    int totalMs = static_cast<int>(m_elapsedTime * 1000.0f);
+    int minutes =  totalMs / 60000;  totalMs %= 60000;
+    int seconds =  totalMs / 1000;   totalMs %= 1000;
+    int millis  =  totalMs;
+
+    // (Opcional) esquina superior derecha
+    ImGui::SetNextWindowBgAlpha(0.35f);
+    ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - 320.0f, 250.0f), ImGuiCond_Always);
+
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize |
+                             ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoInputs;
+    ImGui::Begin("CronometroHUD", nullptr, flags);
+    ImGui::SetWindowFontScale(1.6f);
+    ImGui::Text("%02d:%02d.%03d", minutes, seconds, millis);
     ImGui::End();
   }
 }
