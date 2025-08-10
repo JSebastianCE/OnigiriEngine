@@ -30,6 +30,7 @@
     <ClCompile Include="src\ECS\Actor.cpp" />
     <ClCompile Include="src\ECS\A_Racer.cpp" />
     <ClCompile Include="src\EngineGUI.cpp" />
+    <ClCompile Include="src\Game\A_Player.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\Transform.cpp" />
@@ -62,6 +63,7 @@
     <ClInclude Include="include\ResourceManager.h" />
     <ClInclude Include="include\Utilities\Vector2.h" />
     <ClInclude Include="include\Window.h" />
+    <ClInclude Include="src\Game\A_Player.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

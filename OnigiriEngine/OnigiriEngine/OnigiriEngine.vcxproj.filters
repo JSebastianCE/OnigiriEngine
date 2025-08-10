@@ -22,6 +22,9 @@
     <Filter Include="imgui">
       <UniqueIdentifier>{9154c392-0861-4cda-92af-dbb853deab52}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{5a6782a0-2a38-45fd-8f59-fe32ecc956f9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -68,6 +71,9 @@
     </ClCompile>
     <ClCompile Include="src\ECS\A_Racer.cpp">
       <Filter>Archivos de recursos</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\A_Player.cpp">
+      <Filter>Game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -148,6 +154,9 @@
     </ClInclude>
     <ClInclude Include="include\A_Racer.h">
       <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\A_Player.h">
+      <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -7,11 +7,12 @@
 #include <cmath>       // std::sqrt
 #include <random>
 
+// Control de jugador
 #include "Game/A_Player.h"
 
-
 // RNG local al archivo
-static std::mt19937& app_rng() {
+static 
+std::mt19937& app_rng() {
   static std::mt19937 eng{ std::random_device{}() };
   return eng;
 }
@@ -31,7 +32,7 @@ int BaseApp::run() {
   return 0;
 }
 
-bool 
+bool
 BaseApp::init() {
   ResourceManager& resourceMan = ResourceManager::getInstance();
 
@@ -57,23 +58,9 @@ BaseApp::init() {
     m_Track->setTexture(resourceMan.getTexture("Sprites/Track"));
   }
 
-  // Player (Yoshi) 
-  m_ACircle = EngineUtilities::MakeShared<Actor>("Yoshi");
-  if (!m_ACircle) {
-    ERROR("BaseApp", "init", "Failed to create player Actor, check memory allocation");
-    return false;
-  }
-
-  m_ACircle->getComponent<CShape>()->createShape(CIRCLE);
-  m_ACircle->getComponent<CShape>()->setFillColor(sf::Color::White);
-  m_ACircle->getComponent<Transform>()->setPosition(sf::Vector2f(415.f, 475.f));
-  m_ACircle->getComponent<Transform>()->setScale(sf::Vector2f(3.f, 3));
-
-  if (!resourceMan.loadTexture("Sprites/yoshi", "png")) {
-    MESSAGE("BaseApp", "Init", "Can't load the texture");
-  }
-  m_ACircle->setTexture(resourceMan.getTexture("Sprites/yoshi"));
-  m_actors.push_back(m_ACircle);
+ 
+  // Player (Yoshi) con A_Player
+  auto player = EngineUtilities::MakeShared<A_Player>("Yoshi"); 
 
   //  Waypoints
   m_waypoints.push_back(sf::Vector2f(415.f, 200.f));
@@ -107,15 +94,35 @@ BaseApp::init() {
     m_waypointMarkers.push_back(marker);
   }
 
-  // Por defecto: SIEMPRE cambia (p=1.0), rango [150..350]
-  m_playerSpeedRules.assign(m_waypoints.size(), PlayerSpeedRule{ 1.0f, 150.f, 350.f });
-  // (ejemplo opcional) en el waypoint 5, sólo 50% chance y rango más bajo:
-  if (m_playerSpeedRules.size() > 5) {
-    m_playerSpeedRules[5] = PlayerSpeedRule{ 0.5f, 180.f, 280.f };
-  }
-  // Velocidad inicial del jugador (se puede aleatorizar también)
-  m_playerSpeed = 300.0f;
+  // Configurar el A_Player (componentes, textura, reglas, etc.)
+  {
+    player->getComponent<CShape>()->createShape(CIRCLE);
+    player->getComponent<CShape>()->setFillColor(sf::Color::White);
+    player->getComponent<Transform>()->setScale(sf::Vector2f(3.f, 3));
+    player->getComponent<Transform>()->setPosition(sf::Vector2f(415.f, 475.f)); 
 
+    if (!resourceMan.loadTexture("Sprites/yoshi", "png")) {
+      MESSAGE("BaseApp", "Init", "Can't load the texture");
+    }
+    player->setTexture(resourceMan.getTexture("Sprites/yoshi"));
+
+    // Asignar waypoints al jugador
+    player->setWaypoints(m_waypoints);
+
+    // Reglas de velocidad por waypoint (p=1.0, rango [150..350])
+    std::vector<A_Player::SpeedRule> prules(m_waypoints.size(), { 1.0f, 200.f, 350.f });
+    // ejemplo opcional: en el wp 5, 50% de chance y rango más bajo
+    if (prules.size() > 5) prules[5] = { 0.5f, 180.f, 280.f };
+    player->setSpeedRules(prules);
+
+    // Velocidad base del jugador y radio de detección del waypoint
+    player->setBaseSpeed(280.f);   // velocidad inicial si presionas WASD
+    player->setWaypointRadius(35.f); //  si te cuesta detectar, sube a 22–28
+
+    // Guardar en lista de actores y conservar compatibilidad con m_ACircle (Actor*)
+    m_actors.push_back(player);
+    m_ACircle = player.dynamic_pointer_cast<Actor>(); //  m_ACircle ahora es el A_Player
+  }
 
   //  NPCs 
   auto npc1 = EngineUtilities::MakeShared<A_Racer>("Mario", 1);
@@ -170,12 +177,10 @@ BaseApp::init() {
   npc4->setTexture(resourceMan.getTexture("Sprites/DK"));
   m_actors.push_back(npc4);
 
-
-  //Reglas de velocidad por waypoint para NPCs
+  // [NUEVO] Reglas de velocidad por waypoint para NPCs (probabilidad p y rango [min..max])
   {
     std::vector<A_Racer::SpeedRule> rules(m_waypoints.size(), { 1.0f, 150.f, 350.f });
-    // ejemplo: en el waypoint 10 baja probabilidad
-    if (rules.size() > 10) rules[10] = { 0.4f, 160.f, 260.f };
+    if (rules.size() > 10) rules[10] = { 0.4f, 160.f, 260.f }; // ejemplo
     for (auto& a : m_actors) {
       if (auto r = a.dynamic_pointer_cast<A_Racer>()) {
         r->setSpeedRules(rules);
@@ -183,19 +188,17 @@ BaseApp::init() {
     }
   }
 
-
-
   // Estado de carrera
   m_totalLaps = 4;
-  m_currentWaypointIndex = 0;
-  m_prevPlayerWaypointIndex = m_currentWaypointIndex;
-  m_playerLapCount = 0;
-  m_playerFinished = false;
+  m_currentWaypointIndex = 0;          // [OBSOLETO para Player] se deja por compatibilidad
+  m_prevPlayerWaypointIndex = 0;       // [OBSOLETO para Player]
+  m_playerLapCount = 0;                // [OBSOLETO para Player]
+  m_playerFinished = false;            // [OBSOLETO para Player] ahora se usa A_Player::isFinished
   m_raceFrozen = false;
   m_finishOrder.clear();
   m_winnerName.clear();
 
-  //Cronometro
+  // Cronometro
   m_raceClock.restart();
   m_elapsedTime = 0;
   m_raceFinished = false;
@@ -211,11 +214,8 @@ void BaseApp::update() {
     m_elapsedTime = m_raceClock.getElapsedTime().asSeconds();
   }
 
-
-
   // GUI
   m_engineGUI.update(m_windowPtr, m_windowPtr->deltaTime);
-  //ImGui::ShowDemoWindow(); 
 
   // Se permite movimiento? (se congela cuando llega el 3.º)
   const bool allowMovement = !m_raceFrozen;
@@ -225,85 +225,18 @@ void BaseApp::update() {
     m_Track->update(m_windowPtr->deltaTime.asSeconds());
   }
 
-  // Actualizar actores (NPCs: A_Racer maneja 'finished' internamente)
+  // Actualizar actores (A_Player se controla a sí mismo con WASD, A_Racer con steering)
   for (auto& actor : m_actors) {
     if (!actor.isNull()) {
       actor->update(m_windowPtr->deltaTime.asSeconds());
     }
   }
 
-  //  Mover Yoshi + conteo de vueltas del jugador 
-  float playerDistToNext = 0.0f;
+  // [ELIMINADO] BLOQUE ENTERO: movimiento automático del jugador con seek(),
+  // cambio de velocidad en waypoints, y conteo de vueltas manual (m_playerLapCount).
+  // Ahora todo eso lo lleva internamente A_Player.
 
-  if (!m_waypoints.empty()) {
-    if (allowMovement && !m_playerFinished) {
-      // waypoint objetivo actual
-      sf::Vector2f targetPos = m_waypoints[m_currentWaypointIndex];
-
-      // posición actual
-      sf::Vector2f currentPos = m_ACircle->getComponent<Transform>()->getPosition();
-
-      // distancia al objetivo
-      float dx = targetPos.x - currentPos.x;
-      float dy = targetPos.y - currentPos.y;
-      float distance = std::sqrt(dx * dx + dy * dy);
-
-      // pasar al siguiente waypoint
-      if (distance < 10.0f) {
-        m_prevPlayerWaypointIndex = m_currentWaypointIndex;
-        m_currentWaypointIndex++;
-        if (m_currentWaypointIndex >= static_cast<int>(m_waypoints.size())) {
-          m_currentWaypointIndex = 0;
-        }
-        // cruce de meta: del último -> 0
-        if (m_prevPlayerWaypointIndex == static_cast<int>(m_waypoints.size()) - 1 &&
-          m_currentWaypointIndex == 0) {
-          m_playerLapCount++;
-        }
-
-        {
-          float p = 1.0f, lo = 150.f, hi = 350.f;
-          if (m_currentWaypointIndex < static_cast<int>(m_playerSpeedRules.size())) {
-            const auto& rule = m_playerSpeedRules[m_currentWaypointIndex];
-            p = rule.p; lo = rule.minS; hi = rule.maxS;
-          }
-          std::uniform_real_distribution<float> coin(0.0f, 1.0f);
-          if (coin(app_rng()) <= p) {
-            if (lo > hi) std::swap(lo, hi);
-            std::uniform_real_distribution<float> pick(lo, hi);
-            m_playerSpeed = pick(app_rng());
-          }
-        }
-        targetPos = m_waypoints[m_currentWaypointIndex];
-      }
-
-
-
-      // mover hacia el waypoint con velocidad dinámica del jugador
-      m_ACircle->getComponent<Transform>()->seek(
-        m_waypoints[m_currentWaypointIndex],
-        m_playerSpeed, // ← velocidad del jugador (cambia por waypoint)
-        m_windowPtr->deltaTime.asSeconds(),
-        10.0f
-      );
-
-      if (!m_raceFinished) {
-        m_elapsedTime = m_raceClock.getElapsedTime().asSeconds();
-      }
-
-    }
-
-    // distancia del jugador al siguiente (para ranking)
-    {
-      sf::Vector2f posNow = m_ACircle->getComponent<Transform>()->getPosition();
-      sf::Vector2f tgt = m_waypoints[m_currentWaypointIndex];
-      float ddx = tgt.x - posNow.x;
-      float ddy = tgt.y - posNow.y;
-      playerDistToNext = std::sqrt(ddx * ddx + ddy * ddy);
-    }
-  }
-
-  //  Marcar llegada de NPCs 
+  //  Marcar llegada de NPCs / Player
   if (allowMovement) {
     for (const auto& a : m_actors) {
       if (auto r = a.dynamic_pointer_cast<A_Racer>()) {
@@ -313,12 +246,12 @@ void BaseApp::update() {
           m_finishOrder.push_back(r->getName());
         }
       }
-    }
-
-    //  Marcar llegada del jugador 
-    if (!m_playerFinished && m_playerLapCount >= m_totalLaps) {
-      m_playerFinished = true;
-      m_finishOrder.push_back(m_ACircle->getName());
+      else if (auto p = a.dynamic_pointer_cast<A_Player>()) { // [NUEVO]
+        if (!p->isFinished() && p->getLap() >= m_totalLaps) {
+          p->markFinished(true);
+          m_finishOrder.push_back(p->getName());
+        }
+      }
     }
 
     //  Congelar cuando haya 3 llegados 
@@ -329,24 +262,24 @@ void BaseApp::update() {
     }
   }
 
-  //  RANKING (laps > waypoint > distancia). Incluye Yoshi. 
+  //  RANKING (laps > waypoint > distancia). Incluye Player y NPCs 
   struct Standing { std::string name; int laps; int wp; float dist; bool isPlayer; };
   std::vector<Standing> table;
-  table.reserve(m_actors.size() + 1);
+  table.reserve(m_actors.size());
 
-  // NPCs
   for (const auto& a : m_actors) {
     if (auto r = a.dynamic_pointer_cast<A_Racer>()) {
       table.push_back({ r->getName(), r->getLap(), r->getCurrentWaypointIndex(), r->getDistanceToNextWaypoint(), false });
     }
+    else if (auto p = a.dynamic_pointer_cast<A_Player>()) { // [NUEVO]
+      table.push_back({ p->getName(), p->getLap(), p->getCurrentWaypointIndex(), p->getDistanceToNextWaypoint(), true });
+    }
   }
-  // Player
-  table.push_back({ m_ACircle->getName(), m_playerLapCount, m_currentWaypointIndex, playerDistToNext, true });
 
   std::sort(table.begin(), table.end(),
     [](const Standing& A, const Standing& B) {
       if (A.laps != B.laps) return A.laps > B.laps;
-      if (A.wp != B.wp) return A.wp > B.wp;
+      if (A.wp != B.wp)     return A.wp > B.wp;
       return A.dist < B.dist;
     });
 
@@ -355,11 +288,6 @@ void BaseApp::update() {
   for (int i = 0; i < static_cast<int>(table.size()); ++i) {
     ImGui::Text("%d° - %s%s  (Lap %d)", i + 1, table[i].name.c_str(), table[i].isPlayer ? " (Player)" : "", table[i].laps);
   }
-  ImGui::End();
-
-  // (Opcional) Debug de velocidad del jugador
-  ImGui::Begin("Debug Player");
-  ImGui::Text("Player Speed: %.1f", m_playerSpeed);
   ImGui::End();
 
   // Overlay de ganador y podio 
@@ -385,19 +313,20 @@ void BaseApp::update() {
 
     ImGui::End();
   }
-    // ===== HUD: Cronómetro =====
+
+  // ===== HUD: Cronómetro =====
   {
     int totalMs = static_cast<int>(m_elapsedTime * 1000.0f);
-    int minutes =  totalMs / 60000;  totalMs %= 60000;
-    int seconds =  totalMs / 1000;   totalMs %= 1000;
-    int millis  =  totalMs;
+    int minutes = totalMs / 60000;  totalMs %= 60000;
+    int seconds = totalMs / 1000;   totalMs %= 1000;
+    int millis = totalMs;
 
-    // (Opcional) esquina superior derecha
+    // esquina superior derecha (opcional)
     ImGui::SetNextWindowBgAlpha(0.35f);
     ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - 320.0f, 250.0f), ImGuiCond_Always);
 
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize |
-                             ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoInputs;
+      ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoInputs;
     ImGui::Begin("CronometroHUD", nullptr, flags);
     ImGui::SetWindowFontScale(1.6f);
     ImGui::Text("%02d:%02d.%03d", minutes, seconds, millis);

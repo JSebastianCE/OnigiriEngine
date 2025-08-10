@@ -1,6 +1,8 @@
-#include "A_Player.h"
+﻿#include "A_Player.h"
 #include "ECS/Transform.h"
-#include <SFML/Window/Keyboard.hpp>
+
+#include <SFML/Window/Keyboard.hpp>   // ← teclas (SFML 3)
+#include <algorithm>                   // std::min/max
 #include <cmath>
 #include <random>
 
@@ -19,7 +21,7 @@ void A_Player::setWaypoints(const std::vector<sf::Vector2f>& wps) {
   if (m_speedRules.size() != m_waypoints.size()) {
     m_speedRules.assign(m_waypoints.size(), SpeedRule{ 1.0f, 150.f, 350.f });
   }
-  // Reset b�sico
+  // Reset básico
   m_lapCount = 0;
   m_finished = false;
   m_currentWp = 0;
@@ -34,7 +36,7 @@ void A_Player::setWaypoints(const std::vector<sf::Vector2f>& wps) {
 
 void A_Player::setSpeedRules(const std::vector<SpeedRule>& rules) {
   m_speedRules = rules;
-  if (m_waypoints.size() && m_speedRules.size() != m_waypoints.size()) {
+  if (!m_waypoints.empty() && m_speedRules.size() != m_waypoints.size()) {
     m_speedRules.resize(m_waypoints.size(), SpeedRule{ 1.0f, 150.f, 350.f });
   }
 }
@@ -45,11 +47,13 @@ void A_Player::setBaseSpeed(float s) {
 }
 
 sf::Vector2f A_Player::getDirFromKeys() const {
+  using KC = sf::Keyboard::Scancode;     // ← alias para scancodes (layout-independiente)
+
   float x = 0.f, y = 0.f;
-  if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) y -= 1.f;
-  if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) y += 1.f;
-  if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) x -= 1.f;
-  if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) x += 1.f;
+  if (sf::Keyboard::isKeyPressed(KC::W)) y -= 1.f;
+  if (sf::Keyboard::isKeyPressed(KC::S)) y += 1.f;
+  if (sf::Keyboard::isKeyPressed(KC::A)) x -= 1.f;
+  if (sf::Keyboard::isKeyPressed(KC::D)) x += 1.f;
 
   sf::Vector2f v{ x, y };
   float len = std::sqrt(v.x * v.x + v.y * v.y);
@@ -92,7 +96,7 @@ void A_Player::handleInput(float dt) {
     return;
   }
 
-  // Movimiento simple (sin aceleraciones)
+  // Movimiento simple (sin aceleración)
   sf::Vector2f pos = t->getPosition();
   pos += dir * m_speed * dt;
   t->setPosition(pos);
@@ -105,7 +109,7 @@ void A_Player::onReachNextWaypoint() {
     m_currentWp = 0;
   }
 
-  // cruce de meta: de �ltimo -> 0
+  // cruce de meta: de último -> 0
   if (m_prevWp == static_cast<int>(m_waypoints.size()) - 1 && m_currentWp == 0) {
     m_lapCount++;
   }

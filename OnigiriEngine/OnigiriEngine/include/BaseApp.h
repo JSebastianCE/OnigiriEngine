@@ -6,7 +6,7 @@
  */
 
 #include <Window.h>
-#include "CShape.h" // Agregado para que coincida con el código del profesor
+#include "CShape.h" 
 #include "ECS/Actor.h"
 #include "EngineGUI.h"
 
