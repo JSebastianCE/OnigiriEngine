@@ -10,6 +10,13 @@
 class A_Racer : public Actor {
 public:
 
+  struct 
+  SpeedRule {
+    float p = 1.0f;       // probabilidad de cambiar velocidad (1 = siempre)
+    float minS = 150.f;   // velocidad mínima
+    float maxS = 350.f;   // velocidad máxima
+  };
+
   A_Racer(const std::string& name, int initPlace);
 
   void 
@@ -23,6 +30,10 @@ public:
 
   void 
   setSpeed(float newSpeed);
+
+  void 
+  setSpeedRules(const std::vector<SpeedRule>& rules);
+
 
   int   
   getCurrentWaypointIndex() const { return currentWaypointIndex; }
@@ -56,6 +67,10 @@ private:
 
   std::vector<sf::Vector2f> m_waypoints;
 
+  std::vector<SpeedRule> m_speedRules; 
+
   void 
   seekToCurrentWaypoint(float deltaTime);
+
+  void maybeApplySpeedRuleFor(int waypointIndex); 
 };

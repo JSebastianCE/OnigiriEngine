@@ -5,6 +5,16 @@
 
 #include <algorithm>   // std::sort
 #include <cmath>       // std::sqrt
+#include <random>
+
+#include "Game/A_Player.h"
+
+
+// RNG local al archivo
+static std::mt19937& app_rng() {
+  static std::mt19937 eng{ std::random_device{}() };
+  return eng;
+}
 
 BaseApp::~BaseApp() {}
 
@@ -97,6 +107,16 @@ BaseApp::init() {
     m_waypointMarkers.push_back(marker);
   }
 
+  // Por defecto: SIEMPRE cambia (p=1.0), rango [150..350]
+  m_playerSpeedRules.assign(m_waypoints.size(), PlayerSpeedRule{ 1.0f, 150.f, 350.f });
+  // (ejemplo opcional) en el waypoint 5, sólo 50% chance y rango más bajo:
+  if (m_playerSpeedRules.size() > 5) {
+    m_playerSpeedRules[5] = PlayerSpeedRule{ 0.5f, 180.f, 280.f };
+  }
+  // Velocidad inicial del jugador (se puede aleatorizar también)
+  m_playerSpeed = 300.0f;
+
+
   //  NPCs 
   auto npc1 = EngineUtilities::MakeShared<A_Racer>("Mario", 1);
   npc1->setWaypoints(m_waypoints);
@@ -104,7 +124,7 @@ BaseApp::init() {
   npc1->getComponent<CShape>()->setFillColor(sf::Color::White);
   npc1->getComponent<Transform>()->setScale(sf::Vector2f(3.f, 3.f));
   npc1->getComponent<Transform>()->setPosition(sf::Vector2f(415.f, 475.f));
-  npc1->setSpeed(520.0f);
+  npc1->setSpeed(320.0f);
   if (!resourceMan.loadTexture("Sprites/Mario", "png")) {
     MESSAGE("BaseApp", "Init", "Can't load NPC texture");
   }
@@ -117,7 +137,7 @@ BaseApp::init() {
   npc2->getComponent<CShape>()->setFillColor(sf::Color::White);
   npc2->getComponent<Transform>()->setScale(sf::Vector2f(3.f, 3.f));
   npc2->getComponent<Transform>()->setPosition(sf::Vector2f(415.f, 475.f));
-  npc2->setSpeed(500.0f);
+  npc2->setSpeed(300.0f);
   if (!resourceMan.loadTexture("Sprites/Luigi", "png")) {
     MESSAGE("BaseApp", "Init", "Can't load NPC texture");
   }
@@ -130,7 +150,7 @@ BaseApp::init() {
   npc3->getComponent<CShape>()->setFillColor(sf::Color::White);
   npc3->getComponent<Transform>()->setScale(sf::Vector2f(3.f, 3.f));
   npc3->getComponent<Transform>()->setPosition(sf::Vector2f(415.f, 475.f));
-  npc3->setSpeed(510.0f);
+  npc3->setSpeed(310.0f);
   if (!resourceMan.loadTexture("Sprites/Peach", "png")) {
     MESSAGE("BaseApp", "Init", "Can't load NPC texture");
   }
@@ -143,12 +163,26 @@ BaseApp::init() {
   npc4->getComponent<CShape>()->setFillColor(sf::Color::White);
   npc4->getComponent<Transform>()->setScale(sf::Vector2f(3.f, 3.f));
   npc4->getComponent<Transform>()->setPosition(sf::Vector2f(415.f, 475.f));
-  npc4->setSpeed(515.0f);
+  npc4->setSpeed(315.0f);
   if (!resourceMan.loadTexture("Sprites/DK", "png")) {
     MESSAGE("BaseApp", "Init", "Can't load NPC texture");
   }
   npc4->setTexture(resourceMan.getTexture("Sprites/DK"));
   m_actors.push_back(npc4);
+
+
+  //Reglas de velocidad por waypoint para NPCs
+  {
+    std::vector<A_Racer::SpeedRule> rules(m_waypoints.size(), { 1.0f, 150.f, 350.f });
+    // ejemplo: en el waypoint 10 baja probabilidad
+    if (rules.size() > 10) rules[10] = { 0.4f, 160.f, 260.f };
+    for (auto& a : m_actors) {
+      if (auto r = a.dynamic_pointer_cast<A_Racer>()) {
+        r->setSpeedRules(rules);
+      }
+    }
+  }
+
 
 
   // Estado de carrera
@@ -194,8 +228,6 @@ void BaseApp::update() {
   // Actualizar actores (NPCs: A_Racer maneja 'finished' internamente)
   for (auto& actor : m_actors) {
     if (!actor.isNull()) {
-      // Si quieres frenar TODOS cuando hay freeze, no llames update a NPCs, pero
-      // los dejamos actualizar para mantener visuales sincronizados:
       actor->update(m_windowPtr->deltaTime.asSeconds());
     }
   }
@@ -228,13 +260,29 @@ void BaseApp::update() {
           m_currentWaypointIndex == 0) {
           m_playerLapCount++;
         }
+
+        {
+          float p = 1.0f, lo = 150.f, hi = 350.f;
+          if (m_currentWaypointIndex < static_cast<int>(m_playerSpeedRules.size())) {
+            const auto& rule = m_playerSpeedRules[m_currentWaypointIndex];
+            p = rule.p; lo = rule.minS; hi = rule.maxS;
+          }
+          std::uniform_real_distribution<float> coin(0.0f, 1.0f);
+          if (coin(app_rng()) <= p) {
+            if (lo > hi) std::swap(lo, hi);
+            std::uniform_real_distribution<float> pick(lo, hi);
+            m_playerSpeed = pick(app_rng());
+          }
+        }
         targetPos = m_waypoints[m_currentWaypointIndex];
       }
 
-      // mover hacia el waypoint
+
+
+      // mover hacia el waypoint con velocidad dinámica del jugador
       m_ACircle->getComponent<Transform>()->seek(
         m_waypoints[m_currentWaypointIndex],
-        530.0f,
+        m_playerSpeed, // ← velocidad del jugador (cambia por waypoint)
         m_windowPtr->deltaTime.asSeconds(),
         10.0f
       );
@@ -307,6 +355,11 @@ void BaseApp::update() {
   for (int i = 0; i < static_cast<int>(table.size()); ++i) {
     ImGui::Text("%d° - %s%s  (Lap %d)", i + 1, table[i].name.c_str(), table[i].isPlayer ? " (Player)" : "", table[i].laps);
   }
+  ImGui::End();
+
+  // (Opcional) Debug de velocidad del jugador
+  ImGui::Begin("Debug Player");
+  ImGui::Text("Player Speed: %.1f", m_playerSpeed);
   ImGui::End();
 
   // Overlay de ganador y podio 

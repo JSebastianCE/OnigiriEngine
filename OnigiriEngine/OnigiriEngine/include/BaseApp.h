@@ -79,7 +79,6 @@ private:
   EngineGUI m_engineGUI;
 
 private:
-  // ...
   int  m_totalLaps = 3;
 
   // Estado del jugador (Yoshi)
@@ -95,4 +94,18 @@ private:
   sf::Clock m_raceClock;   // Para medir el tiempo de carrera
   float m_elapsedTime = 0; // Tiempo acumulado en segundos
   bool m_raceFinished = false; // Indica si la carrera terminó
+
+private:
+  float m_playerSpeed = 200.f;
+
+  // Reglas por waypoint del jugador (probabilidad y rango). Si queda vacío,
+  // Por defecto p=1.0, min=150, max=350.
+  struct PlayerSpeedRule {
+    float p = 1.0f;
+    float minS = 150.f;
+    float maxS = 350.f;
+  };
+  std::vector<PlayerSpeedRule> m_playerSpeedRules;
+
+
 };
