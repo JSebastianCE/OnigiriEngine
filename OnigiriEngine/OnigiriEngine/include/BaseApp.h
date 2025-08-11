@@ -1,111 +1,163 @@
-#pragma once
+﻿#pragma once
 
 /**
  * @file BaseApp.h
- * @brief Defines the BaseApp class, which manages the main application loop and rendering.
+ * @brief Declara la clase BaseApp, responsable del ciclo principal de la aplicación/juego:
+ * inicialización, actualización por frame, renderizado y limpieza.
  */
 
 #include <Window.h>
-#include "CShape.h" 
+#include "CShape.h"
 #include "ECS/Actor.h"
 #include "EngineGUI.h"
 
 #include <vector>
+#include <string>
 
- /**
-  * @class BaseApp
-  * @brief Core application class that controls initialization, the main loop, rendering, and cleanup.
-  */
+
+/// Subsistemas de gameplay (arquitectura modular)
+#include "Game/WaypointSystem.h"
+#include "Game/RaceManager.h"
+#include "Game/A_Player.h"
+
+/**
+ * @class BaseApp
+ * @brief Núcleo de la aplicación. Orquesta:
+ *  - creación y administración de la ventana,
+ *  - carga/configuración de actores (pista, jugador, NPCs),
+ *  - inicialización y actualización de los sistemas de gameplay,
+ *  - renderizado del mundo y HUD,
+ *  - ciclo principal (run) y liberación de recursos.
+ *
+ * Esta clase intenta mantener el código de gameplay pesado
+ * en módulos dedicados (RaceManager, WaypointSystem, HUD, Player/NPC).
+ */
+
 class
 BaseApp {
 public:
   /**
-   * @brief Default constructor.
+   * @brief Constructor por defecto. No realiza trabajo pesado.
    */
   BaseApp() = default;
 
   /**
-   * @brief Destructor that handles cleanup.
+   * @brief Destructor. Llama a @ref destroy indirectamente a través de @ref run.
    */
   ~BaseApp();
 
   /**
-   * @brief Runs the application.
-   *
-   * This method initializes the application, enters the main loop, and calls update/render methods.
-   * @return Exit code of the application.
-   */
-  int
+  * @brief Ejecuta el ciclo principal de la aplicación.
+  * Secuencia: @ref init → bucle (eventos, @ref update, @ref render) → @ref destroy.
+  * @return Código de salida del programa. 0 en éxito.
+  */
+  int  
   run();
 
+
   /**
-   * @brief Initializes the application window and objects.
-   * @return True if initialization was successful, false otherwise.
+   * @brief Inicializa recursos base y sistemas.
+   * Crea ventana, inicializa GUI, crea pista y actores (player y NPCs),
+   * define waypoints y configura los sistemas de gameplay.
+   * @return true si la inicialización fue correcta; false si falló.
    */
-  bool
+  bool 
   init();
 
+
   /**
-   * @brief Updates the application logic (called every frame).
+   * @brief Actualiza la lógica por frame.
+   * - Actualiza deltaTime y GUI.
+   * - Llama update() de todos los actores (player procesa WASD internamente).
+   * - Llama @ref RaceManager::update para vueltas, ranking, cronómetro, etc.
    */
-  void
+  void 
   update();
 
-  /**
-   * @brief Renders all drawable objects to the screen.
-   */
-  void
-  render();
 
   /**
-   * @brief Releases all allocated resources and cleans up.
+   * @brief Renderiza la escena por frame.
+   * Dibuja la pista, los marcadores de waypoints, los actores y el HUD
+   * (posiciones, cronómetro y overlay de ganador).
    */
-  void
+  void 
+  render();
+
+
+  /**
+   * @brief Libera recursos y apaga subsistemas.
+   * Llama @ref EngineGUI::destroy. Los punteros inteligentes limpian el resto.
+   */
+  void 
   destroy();
 
 private:
+  // Mundo / render
+
+   /**
+   * @brief Ventana principal (SFML envuelta en Window).
+   */
+  EngineUtilities::TSharedPointer<Window> m_windowPtr;
+
+  /**
+   * @brief Shape auxiliar (reservado para pruebas o elementos sueltos).
+   */
+  EngineUtilities::TSharedPointer<CShape> m_shapePtr;
+
+  /**
+  * @brief Actor de la pista (Track). Renderiza el fondo/textura del circuito.
+  */
+  EngineUtilities::TSharedPointer<Actor>  m_Track;
+
+  // Actores (player + NPCs)
+
+  /**
+   * @brief Lista general de actores renderizables/actualizables.
+   * Incluye al jugador (como Actor) y a todos los NPCs.
+   */
   std::vector<EngineUtilities::TSharedPointer<Actor>> m_actors;
 
-  EngineUtilities::TSharedPointer<Window> m_windowPtr;   ///< Pointer to custom Window class using smart pointer.
-  EngineUtilities::TSharedPointer<CShape> m_shapePtr;    ///< Pointer to custom shape class using smart pointer.
-  EngineUtilities::TSharedPointer<Actor> m_ACircle;
-  EngineUtilities::TSharedPointer<Actor> m_Track;
+  /**
+   * @brief Referencia directa al jugador (A_Player).
+   * Se añade también a @ref m_actors (como Actor) para tratarlos de forma uniforme.
+   */
+  EngineUtilities::TSharedPointer<A_Player> m_player; //  referencia directa al jugador
 
-  std::vector<sf::Vector2f> m_waypoints; ///< Lista de posiciones a seguir por el actor.
-  int m_currentWaypointIndex = 0;        ///< �ndice del waypoint actual.
+  // Waypoints (datos crudos + marcadores)
 
+
+  /**
+   * @brief Lista ordenada de posiciones 2D que definen el trazado del circuito.
+   */
+  std::vector<sf::Vector2f> m_waypoints;
+
+  /**
+ * @brief Marcadores visuales de los waypoints para debug.
+ */
   std::vector<EngineUtilities::TSharedPointer<CShape>> m_waypointMarkers;
 
+  /**
+   * @brief Sistema de GUI (ImGui-SFML).
+   */
   EngineGUI m_engineGUI;
 
-private:
-  int  m_totalLaps = 3;
+  // Configuración de carrera
 
-  // Estado del jugador (Yoshi)
-  int  m_playerLapCount = 0;
-  int  m_prevPlayerWaypointIndex = 0;
-  bool m_playerFinished = false;
+  /**
+   * @brief Número total de vueltas de la carrera.
+   */
+  int m_totalLaps = 3;
 
-  // Meta y final
-  bool m_raceFrozen = false;
-  std::vector<std::string> m_finishOrder; // nombres en orden de llegada (incluye player)
-  std::string m_winnerName;
-
-  sf::Clock m_raceClock;   // Para medir el tiempo de carrera
-  float m_elapsedTime = 0; // Tiempo acumulado en segundos
-  bool m_raceFinished = false; // Indica si la carrera termin�
-
-private:
-  float m_playerSpeed = 200.f;
-
-  // Reglas por waypoint del jugador (probabilidad y rango). Si queda vac�o,
-  // Por defecto p=1.0, min=150, max=350.
-  struct PlayerSpeedRule {
-    float p = 1.0f;
-    float minS = 150.f;
-    float maxS = 350.f;
-  };
-  std::vector<PlayerSpeedRule> m_playerSpeedRules;
+  // Sistemas de gameplay 
 
 
+  /**
+   * @brief Sistema de waypoints (detección de paso, radio, marcadores).
+   */
+  WaypointSystem m_wps;
+
+  /**
+   * @brief Administrador de carrera (vueltas, ranking, cronómetro, freeze).
+   */
+  RaceManager m_race;
 };

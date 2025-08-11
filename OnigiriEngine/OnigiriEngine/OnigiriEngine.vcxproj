@@ -31,6 +31,9 @@
     <ClCompile Include="src\ECS\A_Racer.cpp" />
     <ClCompile Include="src\EngineGUI.cpp" />
     <ClCompile Include="src\Game\A_Player.cpp" />
+    <ClCompile Include="src\Game\HUD.cpp" />
+    <ClCompile Include="src\Game\RaceManager.cpp" />
+    <ClCompile Include="src\Game\WaypointSystem.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\Transform.cpp" />
@@ -64,6 +67,9 @@
     <ClInclude Include="include\Utilities\Vector2.h" />
     <ClInclude Include="include\Window.h" />
     <ClInclude Include="src\Game\A_Player.h" />
+    <ClInclude Include="src\Game\HUD.h" />
+    <ClInclude Include="src\Game\RaceManager.h" />
+    <ClInclude Include="src\Game\WaypointSystem.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -185,7 +191,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>./include/;E:\GraficasOnigiriEngine\OnigiriEngine\OnigiriEngine\ThirdParties\imgui-sfml-master;E:\GraficasOnigiriEngine\OnigiriEngine\OnigiriEngine\ThirdParties\SFML-3.0.0\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./include/;E:\GraficasOnigiriEngine\OnigiriEngine\OnigiriEngine\ThirdParties\imgui-sfml-master;E:\GraficasOnigiriEngine\OnigiriEngine\OnigiriEngine\ThirdParties\SFML-3.0.0\include;E:\EngineUtilities\EngineUtilities1\EngineUtilities\EngineUtilities\include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>

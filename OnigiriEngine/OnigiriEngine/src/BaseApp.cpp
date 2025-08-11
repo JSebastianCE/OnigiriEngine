@@ -1,25 +1,35 @@
-﻿#include "BaseApp.h"
+﻿/**
+ * @file BaseApp.cpp
+ * @brief Implementa la clase BaseApp. Se encarga de:
+ *  - crear ventana y GUI,
+ *  - crear pista, waypoints y actores (player/NPCs),
+ *  - inicializar y actualizar sistemas de gameplay (WaypointSystem, RaceManager),
+ *  - ejecutar el ciclo principal y dibujar el HUD.
+ */
+
+#include "BaseApp.h"
 #include "ResourceManager.h"
 #include "EngineGUI.h"
 #include <A_Racer.h>
 
-#include <algorithm>   // std::sort
-#include <cmath>       // std::sqrt
+#include <algorithm>
+#include <cmath>
 #include <random>
 
-// Control de jugador
-#include "Game/A_Player.h"
-
-// RNG local al archivo
-static 
-std::mt19937& app_rng() {
-  static std::mt19937 eng{ std::random_device{}() };
-  return eng;
-}
+#include "Game/HUD.h"
 
 BaseApp::~BaseApp() {}
 
 int BaseApp::run() {
+  /**
+  * @brief Punto de entrada del ciclo principal.
+  * - Llama a @ref init. Si falla, registra error.
+  * - Mientras la ventana esté abierta:
+  *    - procesa eventos (entrada, GUI),
+  *    - actualiza lógica (@ref update),
+  *    - renderiza la escena (@ref render).
+  * - Una vez termina, llama a @ref destroy.
+  */
   if (!init()) {
     ERROR("BaseApp", "run", "Initializes result on a false statement", "check method validations");
   }
@@ -32,37 +42,45 @@ int BaseApp::run() {
   return 0;
 }
 
-bool
+bool 
 BaseApp::init() {
+  /**
+  * @brief Inicializa recursos, crea actores y configura sistemas.
+  *
+  * Flujo principal:
+  * 1) Crear ventana y GUI.
+  * 2) Crear pista y asignar textura.
+  * 3) Definir lista de waypoints del circuito.
+  * 4) Configurar WaypointSystem con radio de detección y crear marcadores.
+  * 5) Crear Player (A_Player): componentes, textura, speed/base y waypointRadius.
+  * 6) Crear NPCs (A_Racer) y opcionalmente sus reglas de velocidad por waypoint.
+  * 7) Inicializar RaceManager con total de vueltas, player, actores y WaypointSystem.
+  */
   ResourceManager& resourceMan = ResourceManager::getInstance();
 
+  // Ventana
   m_windowPtr = EngineUtilities::MakeShared<Window>(1920, 1080, "Onigiri Engine");
   if (!m_windowPtr) {
     ERROR("BaseApp", "init", "Failed to create window pointer, check memory allocation");
     return false;
   }
-
   m_engineGUI.init(m_windowPtr);
 
-  // Track 
+  // Track (pista) como Actor
   m_Track = EngineUtilities::MakeShared<Actor>("Track Actor");
   if (m_Track) {
     m_Track->getComponent<CShape>()->createShape(RECTANGLE);
     m_Track->getComponent<CShape>()->setFillColor(sf::Color::White);
     m_Track->getComponent<Transform>()->setPosition(sf::Vector2f(350.f, 0.f));
     m_Track->getComponent<Transform>()->setScale(sf::Vector2f(17.0f, 22.0f));
-
     if (!resourceMan.loadTexture("Sprites/Track", "png")) {
       MESSAGE("BaseApp", "Init", "Can't load the texture");
     }
     m_Track->setTexture(resourceMan.getTexture("Sprites/Track"));
   }
 
- 
-  // Player (Yoshi) con A_Player
-  auto player = EngineUtilities::MakeShared<A_Player>("Yoshi"); 
-
-  //  Waypoints
+  //  Waypoints del circuito  
+  m_waypoints.clear();
   m_waypoints.push_back(sf::Vector2f(415.f, 200.f));
   m_waypoints.push_back(sf::Vector2f(445.f, 120.f));
   m_waypoints.push_back(sf::Vector2f(500.f, 100.f));
@@ -84,257 +102,116 @@ BaseApp::init() {
   m_waypoints.push_back(sf::Vector2f(450.f, 960.f));
   m_waypoints.push_back(sf::Vector2f(415.f, 495.f));
 
-  // Marcadores visuales
-  for (const auto& wp : m_waypoints) {
-    auto marker = EngineUtilities::MakeShared<CShape>();
-    marker->createShape(ShapeType::CIRCLE);
-    marker->setFillColor(sf::Color::Yellow);
-    marker->setPosition(wp);
-    marker->setScale(sf::Vector2f(1.f, 1.f));
-    m_waypointMarkers.push_back(marker);
+  // WaypointSystem: radio de detección y marcadores
+  // - Deteccion del paso.
+  // - buildMarkers crea círculos amarillos para depurar.
+  m_wps.setWaypoints(m_waypoints, 48.f);
+  m_wps.buildMarkers(m_waypointMarkers);
+
+  // Player (A_Player)
+  // - El control WASD se procesa dentro de A_Player::update().
+  // - setWaypointRadius alinea la detección interna del player con el sistema global.
+  m_player = EngineUtilities::MakeShared<A_Player>("Yoshi");
+  if (!m_player) {
+    ERROR("BaseApp", "init", "Failed to create player", "");
+    return false;
   }
+  m_player->getComponent<CShape>()->createShape(CIRCLE);
+  m_player->getComponent<CShape>()->setFillColor(sf::Color::White);
+  m_player->getComponent<Transform>()->setScale(sf::Vector2f(3.f, 3.f));
+  m_player->getComponent<Transform>()->setPosition(sf::Vector2f(415.f, 475.f));
+  if (!resourceMan.loadTexture("Sprites/yoshi", "png")) {
+    MESSAGE("BaseApp", "Init", "Can't load the texture");
+  }
+  m_player->setTexture(resourceMan.getTexture("Sprites/yoshi"));
+  // asignar waypoints al player (internamente lleva su conteo y entrada WASD)
+  m_player->setWaypoints(m_waypoints);
+  m_player->setBaseSpeed(300.f); // escala de velocidad al presionar WASD
+  m_player->setWaypointRadius(48.f);
 
-  // Configurar el A_Player (componentes, textura, reglas, etc.)
-  {
-    player->getComponent<CShape>()->createShape(CIRCLE);
-    player->getComponent<CShape>()->setFillColor(sf::Color::White);
-    player->getComponent<Transform>()->setScale(sf::Vector2f(3.f, 3));
-    player->getComponent<Transform>()->setPosition(sf::Vector2f(415.f, 475.f)); 
+  // Añadir player como Actor a la lista general
+  m_actors.push_back(m_player.dynamic_pointer_cast<Actor>());
 
-    if (!resourceMan.loadTexture("Sprites/yoshi", "png")) {
-      MESSAGE("BaseApp", "Init", "Can't load the texture");
+  //  NPCs (A_Racer) – pequeña factoría local con textura y velocidad base
+  auto makeNPC = [&](const char* name, const char* tex, float speed) {
+    auto npc = EngineUtilities::MakeShared<A_Racer>(name, 1);
+    npc->setWaypoints(m_waypoints);
+    npc->getComponent<CShape>()->createShape(CIRCLE);
+    npc->getComponent<CShape>()->setFillColor(sf::Color::White);
+    npc->getComponent<Transform>()->setScale(sf::Vector2f(3.f, 3.f));
+    npc->getComponent<Transform>()->setPosition(sf::Vector2f(415.f, 475.f));
+    npc->setSpeed(speed);
+    if (!resourceMan.loadTexture(std::string("Sprites/") + tex, "png")) {
+      MESSAGE("BaseApp", "Init", "Can't load NPC texture");
     }
-    player->setTexture(resourceMan.getTexture("Sprites/yoshi"));
+    npc->setTexture(resourceMan.getTexture(std::string("Sprites/") + tex));
+    m_actors.push_back(npc);
+    return npc;
+    };
 
-    // Asignar waypoints al jugador
-    player->setWaypoints(m_waypoints);
+  auto npc1 = makeNPC("Mario", "Mario", 320.f);
+  auto npc2 = makeNPC("Luigi", "Luigi", 300.f);
+  auto npc3 = makeNPC("Peach", "Peach", 310.f);
+  auto npc4 = makeNPC("DK", "DK", 315.f);
 
-    // Reglas de velocidad por waypoint (p=1.0, rango [150..350])
-    std::vector<A_Player::SpeedRule> prules(m_waypoints.size(), { 1.0f, 200.f, 350.f });
-    // ejemplo opcional: en el wp 5, 50% de chance y rango más bajo
-    if (prules.size() > 5) prules[5] = { 0.5f, 180.f, 280.f };
-    player->setSpeedRules(prules);
-
-    // Velocidad base del jugador y radio de detección del waypoint
-    player->setBaseSpeed(280.f);   // velocidad inicial si presionas WASD
-    player->setWaypointRadius(35.f); //  si te cuesta detectar, sube a 22–28
-
-    // Guardar en lista de actores y conservar compatibilidad con m_ACircle (Actor*)
-    m_actors.push_back(player);
-    m_ACircle = player.dynamic_pointer_cast<Actor>(); //  m_ACircle ahora es el A_Player
-  }
-
-  //  NPCs 
-  auto npc1 = EngineUtilities::MakeShared<A_Racer>("Mario", 1);
-  npc1->setWaypoints(m_waypoints);
-  npc1->getComponent<CShape>()->createShape(CIRCLE);
-  npc1->getComponent<CShape>()->setFillColor(sf::Color::White);
-  npc1->getComponent<Transform>()->setScale(sf::Vector2f(3.f, 3.f));
-  npc1->getComponent<Transform>()->setPosition(sf::Vector2f(415.f, 475.f));
-  npc1->setSpeed(320.0f);
-  if (!resourceMan.loadTexture("Sprites/Mario", "png")) {
-    MESSAGE("BaseApp", "Init", "Can't load NPC texture");
-  }
-  npc1->setTexture(resourceMan.getTexture("Sprites/Mario"));
-  m_actors.push_back(npc1);
-
-  auto npc2 = EngineUtilities::MakeShared<A_Racer>("Luigi", 1);
-  npc2->setWaypoints(m_waypoints);
-  npc2->getComponent<CShape>()->createShape(CIRCLE);
-  npc2->getComponent<CShape>()->setFillColor(sf::Color::White);
-  npc2->getComponent<Transform>()->setScale(sf::Vector2f(3.f, 3.f));
-  npc2->getComponent<Transform>()->setPosition(sf::Vector2f(415.f, 475.f));
-  npc2->setSpeed(300.0f);
-  if (!resourceMan.loadTexture("Sprites/Luigi", "png")) {
-    MESSAGE("BaseApp", "Init", "Can't load NPC texture");
-  }
-  npc2->setTexture(resourceMan.getTexture("Sprites/Luigi"));
-  m_actors.push_back(npc2);
-
-  auto npc3 = EngineUtilities::MakeShared<A_Racer>("Peach", 1);
-  npc3->setWaypoints(m_waypoints);
-  npc3->getComponent<CShape>()->createShape(CIRCLE);
-  npc3->getComponent<CShape>()->setFillColor(sf::Color::White);
-  npc3->getComponent<Transform>()->setScale(sf::Vector2f(3.f, 3.f));
-  npc3->getComponent<Transform>()->setPosition(sf::Vector2f(415.f, 475.f));
-  npc3->setSpeed(310.0f);
-  if (!resourceMan.loadTexture("Sprites/Peach", "png")) {
-    MESSAGE("BaseApp", "Init", "Can't load NPC texture");
-  }
-  npc3->setTexture(resourceMan.getTexture("Sprites/Peach"));
-  m_actors.push_back(npc3);
-
-  auto npc4 = EngineUtilities::MakeShared<A_Racer>("DK", 1);
-  npc4->setWaypoints(m_waypoints);
-  npc4->getComponent<CShape>()->createShape(CIRCLE);
-  npc4->getComponent<CShape>()->setFillColor(sf::Color::White);
-  npc4->getComponent<Transform>()->setScale(sf::Vector2f(3.f, 3.f));
-  npc4->getComponent<Transform>()->setPosition(sf::Vector2f(415.f, 475.f));
-  npc4->setSpeed(315.0f);
-  if (!resourceMan.loadTexture("Sprites/DK", "png")) {
-    MESSAGE("BaseApp", "Init", "Can't load NPC texture");
-  }
-  npc4->setTexture(resourceMan.getTexture("Sprites/DK"));
-  m_actors.push_back(npc4);
-
-  // [NUEVO] Reglas de velocidad por waypoint para NPCs (probabilidad p y rango [min..max])
+  // Reglas de velocidad por waypoint para NPCs (Modificable)
   {
     std::vector<A_Racer::SpeedRule> rules(m_waypoints.size(), { 1.0f, 150.f, 350.f });
-    if (rules.size() > 10) rules[10] = { 0.4f, 160.f, 260.f }; // ejemplo
+
+    if (rules.size() > 10) rules[10] = { 0.4f, 160.f, 260.f };
     for (auto& a : m_actors) {
-      if (auto r = a.dynamic_pointer_cast<A_Racer>()) {
-        r->setSpeedRules(rules);
-      }
+      if (auto r = a.dynamic_pointer_cast<A_Racer>()) r->setSpeedRules(rules);
     }
   }
 
-  // Estado de carrera
+  // RaceManager: inicializa la carrera (vueltas, referencias y cronómetro)
   m_totalLaps = 4;
-  m_currentWaypointIndex = 0;          // [OBSOLETO para Player] se deja por compatibilidad
-  m_prevPlayerWaypointIndex = 0;       // [OBSOLETO para Player]
-  m_playerLapCount = 0;                // [OBSOLETO para Player]
-  m_playerFinished = false;            // [OBSOLETO para Player] ahora se usa A_Player::isFinished
-  m_raceFrozen = false;
-  m_finishOrder.clear();
-  m_winnerName.clear();
-
-  // Cronometro
-  m_raceClock.restart();
-  m_elapsedTime = 0;
-  m_raceFinished = false;
+  m_race.init(m_totalLaps, m_player, m_actors, &m_wps);
+  m_race.start();
 
   return true;
 }
 
-void BaseApp::update() {
+void 
+BaseApp::update() {
+  /**
+  * @brief Actualización por frame:
+  *  - Actualiza deltaTime y GUI (ImGui-SFML).
+  *  - Sincroniza el Track (Transform → Shape).
+  *  - Llama update() de todos los actores (el Player procesa WASD).
+  *  - Delegación al RaceManager para control de vueltas, llegadas, ranking y freeze.
+  */
   if (!m_windowPtr.isNull()) m_windowPtr->update();
 
-  // Cronómetro: si la carrera no ha terminado, refresca el tiempo
-  if (!m_raceFinished) {
-    m_elapsedTime = m_raceClock.getElapsedTime().asSeconds();
-  }
-
-  // GUI
+  // GUI (ImGui-SFML)
   m_engineGUI.update(m_windowPtr, m_windowPtr->deltaTime);
 
-  // Se permite movimiento? (se congela cuando llega el 3.º)
-  const bool allowMovement = !m_raceFrozen;
-
-  // Actualizar Track (solo sincroniza transform->shape)
+  // Sincroniza track (Transform->Shape)
   if (!m_Track.isNull()) {
     m_Track->update(m_windowPtr->deltaTime.asSeconds());
   }
 
-  // Actualizar actores (A_Player se controla a sí mismo con WASD, A_Racer con steering)
+  // Actualizar todos los actores (player y NPCs)
   for (auto& actor : m_actors) {
-    if (!actor.isNull()) {
-      actor->update(m_windowPtr->deltaTime.asSeconds());
-    }
+    if (!actor.isNull()) actor->update(m_windowPtr->deltaTime.asSeconds());
   }
 
-  // [ELIMINADO] BLOQUE ENTERO: movimiento automático del jugador con seek(),
-  // cambio de velocidad en waypoints, y conteo de vueltas manual (m_playerLapCount).
-  // Ahora todo eso lo lleva internamente A_Player.
+  // Lógica de carrera (vueltas, llegadas, ranking, cronómetro)
+  m_race.update(m_windowPtr->deltaTime.asSeconds());
 
-  //  Marcar llegada de NPCs / Player
-  if (allowMovement) {
-    for (const auto& a : m_actors) {
-      if (auto r = a.dynamic_pointer_cast<A_Racer>()) {
-        if (!r->isFinished() && r->getLap() >= m_totalLaps) {
-          r->markFinished(true);
-          r->setSpeed(0.0f);
-          m_finishOrder.push_back(r->getName());
-        }
-      }
-      else if (auto p = a.dynamic_pointer_cast<A_Player>()) { // [NUEVO]
-        if (!p->isFinished() && p->getLap() >= m_totalLaps) {
-          p->markFinished(true);
-          m_finishOrder.push_back(p->getName());
-        }
-      }
-    }
-
-    //  Congelar cuando haya 3 llegados 
-    if (!m_raceFrozen && m_finishOrder.size() >= 3) {
-      m_raceFrozen = true;
-      m_winnerName = m_finishOrder.front();
-      m_raceFinished = true;         // ← detiene el cronómetro
-    }
-  }
-
-  //  RANKING (laps > waypoint > distancia). Incluye Player y NPCs 
-  struct Standing { std::string name; int laps; int wp; float dist; bool isPlayer; };
-  std::vector<Standing> table;
-  table.reserve(m_actors.size());
-
-  for (const auto& a : m_actors) {
-    if (auto r = a.dynamic_pointer_cast<A_Racer>()) {
-      table.push_back({ r->getName(), r->getLap(), r->getCurrentWaypointIndex(), r->getDistanceToNextWaypoint(), false });
-    }
-    else if (auto p = a.dynamic_pointer_cast<A_Player>()) { // [NUEVO]
-      table.push_back({ p->getName(), p->getLap(), p->getCurrentWaypointIndex(), p->getDistanceToNextWaypoint(), true });
-    }
-  }
-
-  std::sort(table.begin(), table.end(),
-    [](const Standing& A, const Standing& B) {
-      if (A.laps != B.laps) return A.laps > B.laps;
-      if (A.wp != B.wp)     return A.wp > B.wp;
-      return A.dist < B.dist;
-    });
-
-  //  HUD posiciones 
-  ImGui::Begin("Posiciones");
-  for (int i = 0; i < static_cast<int>(table.size()); ++i) {
-    ImGui::Text("%d° - %s%s  (Lap %d)", i + 1, table[i].name.c_str(), table[i].isPlayer ? " (Player)" : "", table[i].laps);
-  }
-  ImGui::End();
-
-  // Overlay de ganador y podio 
-  if (m_raceFrozen) {
-    // Ventana transparente, sin bordes, sin inputs
-    ImGui::SetNextWindowBgAlpha(0.0f);
-    ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoInputs |
-      ImGuiWindowFlags_AlwaysAutoResize;
-    ImGui::Begin("RaceOverlay", nullptr, flags);
-
-    ImGui::SetWindowFontScale(2.5f);
-    ImGui::Text("GANADOR...");
-    ImGui::SetWindowFontScale(3.5f);
-    ImGui::Text("%s", m_winnerName.c_str());
-    ImGui::SetWindowFontScale(1.25f);
-    ImGui::Separator();
-    if (!m_finishOrder.empty()) {
-      ImGui::Text("Podio:");
-      if (m_finishOrder.size() >= 1) ImGui::Text("1) %s", m_finishOrder[0].c_str());
-      if (m_finishOrder.size() >= 2) ImGui::Text("2) %s", m_finishOrder[1].c_str());
-      if (m_finishOrder.size() >= 3) ImGui::Text("3) %s", m_finishOrder[2].c_str());
-    }
-
-    ImGui::End();
-  }
-
-  // ===== HUD: Cronómetro =====
-  {
-    int totalMs = static_cast<int>(m_elapsedTime * 1000.0f);
-    int minutes = totalMs / 60000;  totalMs %= 60000;
-    int seconds = totalMs / 1000;   totalMs %= 1000;
-    int millis = totalMs;
-
-    // esquina superior derecha (opcional)
-    ImGui::SetNextWindowBgAlpha(0.35f);
-    ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - 320.0f, 250.0f), ImGuiCond_Always);
-
-    ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize |
-      ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoInputs;
-    ImGui::Begin("CronometroHUD", nullptr, flags);
-    ImGui::SetWindowFontScale(1.6f);
-    ImGui::Text("%02d:%02d.%03d", minutes, seconds, millis);
-    ImGui::End();
-  }
+  // Regla de finalización: congela al llegar los 3 primeros
+  m_race.freezeIfTopNArrived(3); // congela al llegar los 3 primeros
 }
 
-void BaseApp::render() {
+void 
+BaseApp::render() {
+  /**
+ * @brief Render por frame:
+ *  - Limpia la pantalla.
+ *  - Dibuja la pista, los marcadores de waypoint, los actores.
+ *  - Dibuja HUD: posiciones, cronómetro y overlay de ganador.
+ *  - Presenta el frame.
+ */
   if (!m_windowPtr) return;
 
   m_windowPtr->clear();
@@ -343,23 +220,33 @@ void BaseApp::render() {
     m_Track->getComponent<CShape>()->render(m_windowPtr);
   }
 
+  // Waypoint markers (debug)
   for (const auto& marker : m_waypointMarkers) {
     marker->render(m_windowPtr);
   }
 
   if (m_shapePtr) m_shapePtr->render(m_windowPtr);
 
+  // Dibujar actores
   for (auto& actor : m_actors) {
-    if (!actor.isNull()) {
-      actor->render(m_windowPtr);
-    }
+    if (!actor.isNull()) actor->render(m_windowPtr);
   }
+
+  // HUD (posiciones, cronómetro, ganador)
+  HUD::drawStandings(m_race.standings());
+  HUD::drawTimer(m_race.elapsedSeconds());
+  HUD::drawWinnerOverlay(m_race.frozen(), m_race.winner(), m_race.finishOrder());
+  // HUD::drawPlayerDebug(m_player ? m_player->getSpeed() : 0.f); // si necesitas debug
 
   m_windowPtr->render();
   m_engineGUI.render(m_windowPtr);
   m_windowPtr->display();
 }
 
-void BaseApp::destroy() {
+void 
+BaseApp::destroy() {
+  /**
+   * @brief Apaga la GUI y deja que los punteros inteligentes liberen recursos.
+   */
   m_engineGUI.destroy();
 }

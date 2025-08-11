@@ -4,17 +4,32 @@
 #include <limits>
 #include <random>  
 
-// RNG global al módulo (se inicializa una sola vez)
-static 
+/**
+ * @brief Generador de números aleatorios global para el módulo.
+ * Se inicializa una sola vez y se reutiliza en cada llamada.
+ * @return Referencia a un motor Mersenne Twister.
+ */
+static
 std::mt19937& rng() {
   static std::mt19937 eng{ std::random_device{}() };
   return eng;
 }
 
+/**
+ * @brief Constructor del NPC corredor.
+ * @param name Nombre identificador del actor.
+ * @param initPlace Índice inicial del waypoint donde comenzará.
+ */
 A_Racer::A_Racer(const std::string& name, int initPlace)
   : Actor(name), initialPositionIndex(initPlace), currentWaypointIndex(initPlace) {
 }
 
+/**
+ * @brief Asigna la lista de waypoints que seguirá el NPC.
+ * También inicializa las reglas de velocidad por defecto si estas no
+ * coinciden con el número de waypoints.
+ * @param waypoints Vector de coordenadas 2D que forman la ruta.
+ */
 void 
 A_Racer::setWaypoints(const std::vector<sf::Vector2f>& waypoints) {
   m_waypoints = waypoints;
@@ -25,15 +40,28 @@ A_Racer::setWaypoints(const std::vector<sf::Vector2f>& waypoints) {
   resetPosition();
 }
 
+
+/**
+ * @brief Establece reglas de velocidad para cada waypoint.
+ * Si la cantidad de reglas no coincide con la cantidad de waypoints,
+ * se ajusta automáticamente para igualar el tamaño.
+ * @param rules Vector con las reglas de velocidad.
+ */
 void 
 A_Racer::setSpeedRules(const std::vector<SpeedRule>& rules) {
   m_speedRules = rules;
-  // asegura tamaño correcto si difiere
+  // Ajusta tamaño si difiere del número de waypoints
   if (m_speedRules.size() != m_waypoints.size() && !m_waypoints.empty()) {
     m_speedRules.resize(m_waypoints.size(), SpeedRule{ 1.0f, 150.f, 350.f });
   }
 }
 
+/**
+ * @brief Reinicia la posición y estado del NPC.
+ * Coloca al corredor en su waypoint inicial, reinicia vueltas y estado
+ * de finalización, y aplica una velocidad inicial basada en la regla
+ * del primer waypoint.
+ */
 void 
 A_Racer::resetPosition() {
   if (!m_waypoints.empty()) {
@@ -44,11 +72,19 @@ A_Racer::resetPosition() {
     if (auto t = getComponent<Transform>()) {
       t->setPosition(m_waypoints[currentWaypointIndex]);
     }
-    // aplica una velocidad inicial coherente con el primer waypoint
     maybeApplySpeedRuleFor(currentWaypointIndex);
   }
 }
 
+/**
+ * @brief Actualiza la lógica del NPC en cada frame.
+ *
+ * Si el corredor ha finalizado, solo actualiza sus componentes sin
+ * movimiento adicional. De lo contrario, se mueve hacia el waypoint
+ * actual.
+ *
+ * @param deltaTime Tiempo transcurrido desde el último frame (en segundos).
+ */
 void 
 A_Racer::update(float deltaTime) {
   if (finished) { Actor::update(deltaTime); return; }
@@ -59,6 +95,15 @@ A_Racer::update(float deltaTime) {
   }
 }
 
+/**
+ * @brief Mueve al NPC hacia el waypoint actual.
+ *
+ * - Si llega al waypoint, avanza al siguiente.
+ * - Si cruza la meta, incrementa el contador de vueltas.
+ * - Puede cambiar su velocidad según la regla del waypoint.
+ *
+ * @param deltaTime Tiempo transcurrido desde el último frame (en segundos).
+ */
 void 
 A_Racer::seekToCurrentWaypoint(float deltaTime) {
   auto transform = getComponent<Transform>();
@@ -66,7 +111,6 @@ A_Racer::seekToCurrentWaypoint(float deltaTime) {
 
   sf::Vector2f pos = transform->getPosition();
   sf::Vector2f target = m_waypoints[currentWaypointIndex];
-
   sf::Vector2f dir = target - pos;
 
   float distance = std::sqrt(dir.x * dir.x + dir.y * dir.y);
@@ -98,9 +142,19 @@ A_Racer::seekToCurrentWaypoint(float deltaTime) {
   transform->setPosition(pos + velocity * deltaTime);
 }
 
+/**
+ * @brief Establece la velocidad actual del NPC.
+ * @param newSpeed Nueva velocidad.
+ */
 void 
 A_Racer::setSpeed(float newSpeed) { speed = newSpeed; }
 
+/**
+ * @brief Obtiene la distancia al siguiente waypoint.
+ *
+ * @return Distancia en píxeles al próximo waypoint.
+ * Si no hay waypoints, devuelve un valor máximo.
+ */
 float 
 A_Racer::getDistanceToNextWaypoint() const {
   if (m_waypoints.empty()) return std::numeric_limits<float>::max();
@@ -110,15 +164,22 @@ A_Racer::getDistanceToNextWaypoint() const {
   if (!t) return std::numeric_limits<float>::max();
 
   sf::Vector2f pos = t->getPosition();
-
   sf::Vector2f target = m_waypoints[currentWaypointIndex];
+
   float dx = target.x - pos.x;
   float dy = target.y - pos.y;
   return std::sqrt(dx * dx + dy * dy);
 }
 
-// NUEVO: aplica probabilidad y rango por waypoint
-void 
+/**
+ * @brief Aplica la regla de velocidad de un waypoint.
+ *
+ * - La velocidad cambia solo si la probabilidad `p` se cumple.
+ * - El nuevo valor se elige aleatoriamente dentro del rango `[minS, maxS]`.
+ *
+ * @param waypointIndex Índice del waypoint para aplicar la regla.
+ */
+void
 A_Racer::maybeApplySpeedRuleFor(int waypointIndex) {
   if (m_speedRules.empty()) return;
 
